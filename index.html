@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlobeTrotter — Indian Expeditions & Dynamic Studio</title>
+<title>GlobeTrotter — Indian Expeditions & Itinerary Builder</title>
 
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -22,6 +22,7 @@
     --muted: #64748B;
     --error: #DC2626;
     --line: rgba(17, 26, 44, 0.1);
+    --success: #15803D;
   }
 
   *{ box-sizing: border-box; margin: 0; padding: 0; }
@@ -340,7 +341,7 @@
   }
 
   /* ---- 2. DASHBOARD / HOME SCREEN ---- */
-  .dashboard-stage, .trip-screen-stage{
+  .dashboard-stage, .trip-screen-stage, .itinerary-stage{
     display: none;
     width: 100%;
     max-width: 1240px;
@@ -470,7 +471,6 @@
     transform: translateY(-1px);
   }
 
-  /* Budget Highlights Bar */
   .budget-bar{
     background: #FFFFFF;
     border-radius: 12px;
@@ -524,7 +524,6 @@
   }
   .section-label a:hover{ color: var(--navy); text-decoration: underline; }
 
-  /* Trips Grid Container */
   .trips-grid{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -598,7 +597,6 @@
   .trip-budget-tag{ font-weight: 700; color: var(--navy); }
   .trip-link{ color: var(--gold); text-decoration: none; font-weight: 700; }
 
-  /* Empty state box */
   .no-trips-box{
     grid-column: span 2;
     background: #FFFFFF;
@@ -625,7 +623,6 @@
     max-width: 400px;
   }
 
-  /* Extended 8-destination grid */
   .cities-grid{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -665,7 +662,7 @@
     letter-spacing: 0.05em;
   }
 
-  /* ---- 3. TRIP SCREEN (DEDICATED FULL VIEW) ---- */
+  /* ---- 3. TRIP SCREEN (STUDIO) ---- */
   .trip-studio-card{
     background: #FFFFFF;
     border-radius: 16px;
@@ -791,6 +788,224 @@
   .preview-meta-label{ color: rgba(250,247,242,0.5); font-size: 9px; text-transform: uppercase; }
   .preview-meta-val{ color: var(--gold-glow); font-weight: 700; }
 
+  /* ---- 4. SCREEN 5: ITINERARY BUILDER SCREEN ---- */
+  .itinerary-layout{
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .stop-card{
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  .stop-card:hover{ border-color: rgba(10,20,36,0.3); }
+
+  .stop-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .stop-number-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .stop-badge-pill{
+    background: var(--navy);
+    color: var(--gold);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .reorder-actions{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .reorder-btn{
+    background: var(--sand);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    transition: all 0.15s;
+  }
+  .reorder-btn:hover:not(:disabled){
+    background: var(--navy);
+    color: var(--sand);
+  }
+  .reorder-btn:disabled{ opacity: 0.3; cursor: not-allowed; }
+
+  .delete-stop-btn{
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    color: var(--error);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+  }
+  .delete-stop-btn:hover{ background: var(--error); color: #FFF; }
+
+  .activities-container{
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .activity-item{
+    background: var(--sand);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .activity-title{
+    flex: 1;
+    font-weight: 500;
+    color: var(--navy);
+  }
+  .activity-time-tag{
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--muted);
+  }
+  .remove-act-btn{
+    background: none;
+    border: none;
+    color: var(--error);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  .add-act-bar{
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .add-act-input{
+    flex: 1;
+    background: #FFFFFF !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 12.5px !important;
+  }
+  .add-act-btn{
+    background: var(--navy);
+    color: var(--sand);
+    border: none;
+    border-radius: 6px;
+    padding: 0 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* Right Column: Timeline Summary Card */
+  .timeline-preview-sticky{
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    padding: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+    position: sticky;
+    top: 24px;
+  }
+
+  .timeline-list{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    margin-top: 20px;
+  }
+  .timeline-list::before{
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 15px;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .timeline-node{
+    position: relative;
+    padding-left: 36px;
+  }
+  .timeline-dot{
+    position: absolute;
+    left: 8px;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 3px solid var(--gold);
+    z-index: 2;
+  }
+
+  .node-city{
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .node-dates{
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .node-acts{
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
   /* Modals */
   .modal-backdrop{
     display: none;
@@ -857,6 +1072,7 @@
   }
 
   @media (max-width: 920px){
+    .itinerary-layout{ grid-template-columns: 1fr; }
     .trip-studio-card{ grid-template-columns: 1fr; }
     .ticket-stage{ grid-template-columns: 1fr; }
     .stub-divider, .ticket-stage::before, .ticket-stage::after{ display: none; }
@@ -1137,77 +1353,35 @@
     <div class="dash-header">
       <div>
         <h1 class="welcome-title">Expedition Studio</h1>
-        <p class="welcome-sub">Configure and customize your comprehensive Indian travel itinerary.</p>
+        <p class="welcome-sub">Configure basic details, then launch the Day-Wise Itinerary Builder.</p>
       </div>
-      <span class="nav-tag">✦ All Regions of India</span>
+      <span class="nav-tag">✦ Phase 1: Setup</span>
     </div>
 
     <!-- The 2-Column Trip Studio Card -->
     <div class="trip-studio-card">
       
-      <!-- Left Column: Full Form with all requested components -->
-      <form id="studio-trip-form" class="trip-studio-form active" onsubmit="handleSaveTrip(event)">
-        
-        <!-- Region / Area in India -->
+      <!-- Left Column: Form -->
+      <form id="studio-trip-form" class="trip-studio-form active" onsubmit="handleProceedToItinerary(event)">
         <div class="field">
-          <label for="studio-region">Select Area / Destination in India</label>
+          <label for="studio-region">Select Primary Region / Theme in India</label>
           <select id="studio-region" onchange="handleRegionChange()" required>
-            <optgroup label="─── NORTH INDIA ───">
-              <option value="Jaipur, Rajasthan">Jaipur — Pink City &amp; Forts (Rajasthan)</option>
-              <option value="Udaipur, Rajasthan">Udaipur — City of Lakes (Rajasthan)</option>
-              <option value="Jodhpur, Rajasthan">Jodhpur — Blue City (Rajasthan)</option>
-              <option value="Varanasi, Uttar Pradesh">Varanasi — Holy Ganges Ghats (Uttar Pradesh)</option>
-              <option value="Agra, Uttar Pradesh">Agra — Taj Mahal &amp; Mughal Heritage</option>
-              <option value="Rishikesh, Uttarakhand">Rishikesh &amp; Haridwar — Yoga &amp; Rafting</option>
-              <option value="Manali &amp; Shimla, Himachal Pradesh">Manali &amp; Shimla — Pine Valleys &amp; Snow</option>
-              <option value="Leh-Ladakh, Ladakh">Leh-Ladakh — High Himalayan Desert</option>
-              <option value="Srinagar &amp; Gulmarg, Kashmir">Srinagar &amp; Gulmarg — Dal Lake &amp; Meadows</option>
-              <option value="Amritsar, Punjab">Amritsar — Golden Temple &amp; Culture</option>
-            </optgroup>
-
-            <optgroup label="─── SOUTH INDIA ───">
-              <option value="Munnar &amp; Alleppey, Kerala">Munnar &amp; Alleppey — Tea Hills &amp; Houseboats</option>
-              <option value="Kochi, Kerala">Kochi — Colonial Fort &amp; Spice Bazaars</option>
-              <option value="Coorg &amp; Kabini, Karnataka">Coorg &amp; Kabini — Coffee Hills &amp; Wildlife</option>
-              <option value="Hampi, Karnataka">Hampi — UNESCO Vijayanagara Ruins</option>
-              <option value="Ooty &amp; Nilgiris, Tamil Nadu">Ooty &amp; Nilgiris — Mountain Railway &amp; Valleys</option>
-              <option value="Madurai &amp; Rameswaram, Tamil Nadu">Madurai &amp; Rameswaram — Dravidian Temples</option>
-              <option value="Pondicherry, UT">Pondicherry — French Quarter &amp; Coastal Promenades</option>
-              <option value="Hyderabad, Telangana">Hyderabad — Nizam Heritage &amp; Charminar</option>
-            </optgroup>
-
-            <optgroup label="─── WEST INDIA &amp; ISLANDS ───">
-              <option value="Goa (North &amp; South), Goa">Goa — Beaches, Forts &amp; Portuguese Heritage</option>
-              <option value="Mumbai, Maharashtra">Mumbai — Gateway of India &amp; Marine Drive</option>
-              <option value="Rann of Kutch, Gujarat">Rann of Kutch — White Salt Desert &amp; Crafts</option>
-              <option value="Gir National Park, Gujarat">Gir — Asiatic Lion Safari (Gujarat)</option>
-              <option value="Andaman &amp; Nicobar Islands, UT">Andaman Islands — Radhanagar Beach &amp; Reefs</option>
-            </optgroup>
-
-            <optgroup label="─── EAST &amp; NORTHEAST INDIA ───">
-              <option value="Darjeeling &amp; Kalimpong, West Bengal">Darjeeling — Kanchenjunga Vistas &amp; Tea</option>
-              <option value="Kolkata, West Bengal">Kolkata — Victoria Memorial &amp; Cultural Hub</option>
-              <option value="Puri &amp; Konark, Odisha">Puri &amp; Konark — Sun Temple &amp; Bay of Bengal</option>
-              <option value="Gangtok &amp; Pelling, Sikkim">Gangtok &amp; North Sikkim — Monasteries &amp; Valleys</option>
-              <option value="Kaziranga &amp; Majuli, Assam">Kaziranga — One-Horned Rhino Safari (Assam)</option>
-              <option value="Shillong &amp; Cherrapunji, Meghalaya">Meghalaya — Living Root Bridges &amp; Waterfalls</option>
-              <option value="Tawang, Arunachal Pradesh">Tawang — Himalayan High Monasteries</option>
-            </optgroup>
-
-            <optgroup label="─── CENTRAL INDIA ───">
-              <option value="Kanha &amp; Bandhavgarh, MP">Kanha &amp; Bandhavgarh — Royal Tiger Reserves</option>
-              <option value="Khajuraho, Madhya Pradesh">Khajuraho &amp; Orchha — Ancient Temple Carvings</option>
+            <optgroup label="─── POPULAR CIRCUITS ───">
+              <option value="Rajasthan Heritage Circuit">Rajasthan Heritage Circuit (Jaipur, Udaipur, Jodhpur)</option>
+              <option value="Himalayan Adventure">Himalayan Adventure (Rishikesh, Manali, Ladakh)</option>
+              <option value="Kerala Backwaters & Hills">Kerala Backwaters &amp; Hills (Munnar, Alleppey, Kochi)</option>
+              <option value="Golden Triangle & Ganga">Golden Triangle &amp; Ganga (Agra, Jaipur, Varanasi)</option>
+              <option value="Goa & Coastal Western Ghats">Goa &amp; Coastal Western Ghats</option>
+              <option value="Northeast Serenity">Northeast Serenity (Darjeeling, Gangtok, Shillong)</option>
             </optgroup>
           </select>
         </div>
 
-        <!-- 1. Trip Name -->
         <div class="field">
           <label for="studio-trip-name">Trip Name</label>
           <input type="text" id="studio-trip-name" placeholder="e.g. Royal Rajasthan Winter Odyssey" oninput="updateLivePreview()" required>
         </div>
 
-        <!-- 2. Start & End Dates -->
         <div class="studio-row-2">
           <div class="field">
             <label for="studio-start-date">Start Date</label>
@@ -1219,7 +1393,6 @@
           </div>
         </div>
 
-        <!-- Travel Party & Budget -->
         <div class="studio-row-2">
           <div class="field">
             <label for="studio-pax">Number of Travelers</label>
@@ -1231,36 +1404,33 @@
           </div>
         </div>
 
-        <!-- 3. Trip Description -->
         <div class="field">
-          <label for="studio-desc">Trip Description &amp; Itinerary Highlights</label>
-          <textarea id="studio-desc" rows="3" placeholder="Describe the journey, special stays, food walks, train bookings, or adventure plans..." oninput="updateLivePreview()"></textarea>
+          <label for="studio-desc">Trip Overview &amp; Special Requests</label>
+          <textarea id="studio-desc" rows="3" placeholder="Describe overall vision..." oninput="updateLivePreview()"></textarea>
         </div>
 
-        <!-- 4. Cover Photo Upload (Optional) -->
         <div class="field">
           <label>Cover Photo Upload (Optional)</label>
           <div class="photo-upload-zone" id="upload-dropzone">
             <input type="file" id="studio-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">
             <span style="font-size:24px; margin-bottom:6px;">📷</span>
             <div style="font-size:12px; font-weight:700; color:var(--navy);">Click to Upload Photo or Drag &amp; Drop</div>
-            <div style="font-size:10px; color:var(--muted); margin-top:2px;">PNG, JPG, WebP up to 10MB (Defaults to curated city visual)</div>
+            <div style="font-size:10px; color:var(--muted); margin-top:2px;">PNG, JPG, WebP up to 10MB</div>
             <img id="studio-photo-preview" class="photo-preview" alt="Preview">
           </div>
         </div>
 
-        <!-- 5. Save Button -->
-        <button type="submit" class="submit" style="padding: 16px; font-size: 13px;">✦ Save &amp; Publish Expedition</button>
+        <button type="submit" class="submit" style="padding: 16px; font-size: 13px;">✦ Continue to Step 5: Build Day-Wise Itinerary →</button>
       </form>
 
-      <!-- Right Column: Real-Time Interactive Boarding Card Preview -->
+      <!-- Right Column: Card Preview -->
       <div class="trip-preview-panel">
         <div class="live-cover-bg" id="preview-cover-bg"></div>
         <div class="preview-content">
           <div>
             <div class="preview-tag" id="preview-badge">Live Draft Preview</div>
             <h2 class="preview-trip-name" id="preview-title">Royal Rajasthan Winter Odyssey</h2>
-            <div style="font-family:'Space Mono', monospace; font-size:11px; color:var(--gold); margin-top:4px;" id="preview-dest">Jaipur, Rajasthan</div>
+            <div style="font-family:'Space Mono', monospace; font-size:11px; color:var(--gold); margin-top:4px;" id="preview-dest">Rajasthan Circuit</div>
           </div>
 
           <div class="preview-meta-grid">
@@ -1285,13 +1455,13 @@
           <div>
             <span class="preview-meta-label" style="display:block; margin-bottom:4px;">Description Snippet</span>
             <p style="font-size:12.5px; line-height:1.5; color:rgba(250,247,242,0.85); font-style:italic;" id="preview-desc-text">
-              No description entered yet. Type in the form to watch your live boarding card update!
+              Configure parameters to enter the dynamic day-wise builder.
             </p>
           </div>
 
           <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:14px; display:flex; justify-content:space-between; font-family:'Space Mono', monospace; font-size:10px; color:rgba(250,247,242,0.6);">
-            <span>STATUS: READY TO SAVE</span>
-            <span>SYSTEM: GLOBETROTTER IN</span>
+            <span>STATUS: DRAFT</span>
+            <span>BUILDER: SCREEN 5 READY</span>
           </div>
         </div>
       </div>
@@ -1300,9 +1470,67 @@
   </div>
 </div>
 
-<!-- ================= 4. MODALS ================= -->
+<!-- ================= 4. SCREEN 5: ITINERARY BUILDER SCREEN ================= -->
+<div class="itinerary-stage" id="itinerary-stage">
+  <header class="dash-nav">
+    <div class="brand">Globe<span>Trotter</span></div>
+    <div class="dash-nav-right">
+      <button class="quick-btn" onclick="navigateToTripScreen()">← Edit Basics</button>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
 
-<!-- Modal: Interactive Leaflet Map -->
+  <div class="dash-body">
+    <div class="dash-header">
+      <div>
+        <div class="nav-tag" style="display:inline-block; margin-bottom:8px;">5. Itinerary Builder Screen</div>
+        <h1 class="welcome-title" id="itin-header-title">Day-Wise Plan & City Stops</h1>
+        <p class="welcome-sub">Construct your day-wise plan: Add cities, choose stop dates, assign activities, and reorder stops.</p>
+      </div>
+      <div class="quick-actions-bar">
+        <button class="quick-btn" onclick="addNewStop()">+ Add Stop</button>
+        <button class="plan-trip-btn" onclick="finalizeExpedition()">✦ Finalize &amp; Save Expedition</button>
+      </div>
+    </div>
+
+    <!-- 2 Column Itinerary Workspace -->
+    <div class="itinerary-layout">
+      
+      <!-- Left Column: Stops & Activities Manager -->
+      <div>
+        <div class="section-label">
+          <span>Configured Stops &amp; Activities</span>
+          <span style="font-size: 11px; color: var(--muted);" id="itin-total-stops-count">2 Stops Configured</span>
+        </div>
+
+        <!-- Dynamic Container for Stops -->
+        <div id="stops-list-container"></div>
+
+        <button class="quick-btn" style="width:100%; border:2px dashed var(--navy); padding:16px; font-weight:700; background:#FFF;" onclick="addNewStop()">
+          ➕ Add Another Indian City Stop
+        </button>
+      </div>
+
+      <!-- Right Column: Real-Time Day-Wise Timeline Flow -->
+      <div>
+        <div class="timeline-preview-sticky">
+          <div class="section-label" style="margin-bottom:8px;">
+            <span>Interactive Day-Wise Format</span>
+            <span style="font-size:10px; color:var(--success); font-weight:700;">● LIVE SYNC</span>
+          </div>
+          <p style="font-size:12px; color:var(--muted); line-height:1.4;">
+            Review your sequential stops. Reordering cities on the left will instantly recompute the day breakdown below.
+          </p>
+
+          <div class="timeline-list" id="timeline-flow-container"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================= 5. MODALS ================= -->
 <div class="modal-backdrop" id="map-modal">
   <div class="modal-card wide">
     <div class="modal-head">
@@ -1316,7 +1544,6 @@
   </div>
 </div>
 
-<!-- Modal: Trip Details / Review -->
 <div class="modal-backdrop" id="trip-detail-modal">
   <div class="modal-card">
     <div class="modal-head">
@@ -1344,8 +1571,8 @@
       </div>
 
       <div>
-        <div style="font-family:'Space Mono', monospace; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; margin-bottom:8px;">Itinerary Schedule &amp; Description</div>
-        <p style="font-size:13.5px; line-height:1.6; color:var(--muted);" id="trip-detail-schedule"></p>
+        <div style="font-family:'Space Mono', monospace; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; margin-bottom:8px;">Itinerary Schedule &amp; Stops</div>
+        <div style="font-size:13.5px; line-height:1.6; color:var(--muted);" id="trip-detail-schedule"></div>
       </div>
 
       <button class="submit" onclick="closeModal('trip-detail-modal')">Close Review</button>
@@ -1357,40 +1584,30 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-  // Regional Default Imagery Cache
+  // City Master list with pre-curated highlights
+  const allIndianCities = [
+    { name: "Jaipur, Rajasthan", defaultActivities: ["Visit Amber Fort & Sheesh Mahal", "Hawa Mahal Photography Session", "Local Johari Bazaar Street Food Walk"] },
+    { name: "Udaipur, Rajasthan", defaultActivities: ["Lake Pichola Sunset Boat Ride", "City Palace Museum Guided Tour", "Saheliyon Ki Bari Walk"] },
+    { name: "Jodhpur, Rajasthan", defaultActivities: ["Mehrangarh Fort Zip-lining", "Blue City Heritage Walking Tour", "Umaid Bhawan Palace Visit"] },
+    { name: "Varanasi, Uttar Pradesh", defaultActivities: ["Dashashwamedh Ghat Evening Ganga Aarti", "Dawn Boat Ride on the Ganges", "Kashi Vishwanath Corridor Walk"] },
+    { name: "Rishikesh, Uttarakhand", defaultActivities: ["White Water Rafting (16km/26km)", "Beatles Ashram Exploration", "Triveni Ghat Evening Aarti"] },
+    { name: "Munnar, Kerala", defaultActivities: ["Tea Plantation Trek & Museum", "Eravikulam National Park Safari", "Mattupetty Dam Viewpoint"] },
+    { name: "Alleppey, Kerala", defaultActivities: ["Overnight Luxury Houseboat Cruise", "Vembanad Lake Sunset Canoe", "Kerala Traditional Sadhya Lunch"] },
+    { name: "Goa (North & South)", defaultActivities: ["Old Goa Basilica & Se Cathedral", "Anjuna & Vagator Sunset Beach Walk", "Mandovi River Cruise & Seafood"] },
+    { name: "Leh-Ladakh", defaultActivities: ["Drive through Khardung La Pass", "Pangong Tso Lake Camping", "Thiksey Monastery Morning Prayer"] },
+    { name: "Darjeeling, West Bengal", defaultActivities: ["Tiger Hill Sunrise over Kanchenjunga", "Heritage Toy Train Joyride", "Happy Valley Tea Estate Tour"] }
+  ];
+
   const regionImages = {
     "Jaipur, Rajasthan": "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=800&q=80",
     "Udaipur, Rajasthan": "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80",
     "Jodhpur, Rajasthan": "https://images.unsplash.com/photo-1588714477688-cf28a50e94f7?auto=format&fit=crop&w=800&q=80",
     "Varanasi, Uttar Pradesh": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=800&q=80",
-    "Agra, Uttar Pradesh": "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80",
     "Rishikesh, Uttarakhand": "https://images.unsplash.com/photo-1592635196078-9ffc8f5f849b?auto=format&fit=crop&w=800&q=80",
-    "Manali & Shimla, Himachal Pradesh": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
-    "Leh-Ladakh, Ladakh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
-    "Srinagar & Gulmarg, Kashmir": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=800&q=80",
-    "Amritsar, Punjab": "https://images.unsplash.com/photo-1588096344356-9b519d08e5e6?auto=format&fit=crop&w=800&q=80",
-    "Munnar & Alleppey, Kerala": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
-    "Kochi, Kerala": "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80",
-    "Coorg & Kabini, Karnataka": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
-    "Hampi, Karnataka": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80",
-    "Ooty & Nilgiris, Tamil Nadu": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
-    "Madurai & Rameswaram, Tamil Nadu": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
-    "Pondicherry, UT": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
-    "Hyderabad, Telangana": "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80",
-    "Goa (North & South), Goa": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
-    "Mumbai, Maharashtra": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80",
-    "Rann of Kutch, Gujarat": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=80",
-    "Gir National Park, Gujarat": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
-    "Andaman & Nicobar Islands, UT": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=80",
-    "Darjeeling & Kalimpong, West Bengal": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
-    "Kolkata, West Bengal": "https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=800&q=80",
-    "Puri & Konark, Odisha": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80",
-    "Gangtok & Pelling, Sikkim": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
-    "Kaziranga & Majuli, Assam": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
-    "Shillong & Cherrapunji, Meghalaya": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
-    "Tawang, Arunachal Pradesh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
-    "Kanha & Bandhavgarh, MP": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
-    "Khajuraho, Madhya Pradesh": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80"
+    "Munnar, Kerala": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
+    "Goa (North & South)": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+    "Leh-Ladakh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
+    "Darjeeling, West Bengal": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80"
   };
 
   let userTrips = [];
@@ -1398,36 +1615,57 @@
   let customUploadedImage = "";
   let calculatedTripDays = 6;
 
-  // View Navigation
-  function navigateToTripScreen(){
+  // Active expedition being built in Screen 5
+  let activeDraft = {
+    name: "",
+    region: "",
+    startDate: "",
+    endDate: "",
+    pax: 2,
+    budget: 50000,
+    desc: "",
+    stops: []
+  };
+
+  // Switch Screens
+  function hideAllScreens(){
+    document.getElementById('auth-stage').style.display = 'none';
     document.getElementById('dashboard-stage').style.display = 'none';
-    document.getElementById('trip-screen-stage').style.display = 'block';
-    resetStudioForm();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('trip-screen-stage').style.display = 'none';
+    document.getElementById('itinerary-stage').style.display = 'none';
   }
 
   function navigateToDashboard(){
-    document.getElementById('trip-screen-stage').style.display = 'none';
+    hideAllScreens();
     document.getElementById('dashboard-stage').style.display = 'block';
     renderDashboard();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  function navigateToTripScreen(){
+    hideAllScreens();
+    document.getElementById('trip-screen-stage').style.display = 'block';
+    resetStudioForm();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function navigateToItineraryScreen(){
+    hideAllScreens();
+    document.getElementById('itinerary-stage').style.display = 'block';
+    document.getElementById('itin-header-title').textContent = `${activeDraft.name} — Itinerary Planner`;
+    renderStops();
+    renderTimelinePreview();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function quickPlanCity(cityName, regionLabel){
     navigateToTripScreen();
-    const select = document.getElementById('studio-region');
-    for(let i=0; i<select.options.length; i++){
-      if(select.options[i].text.includes(cityName)){
-        select.selectedIndex = i;
-        break;
-      }
-    }
     document.getElementById('studio-trip-name').value = `${cityName} Expedition`;
-    document.getElementById('studio-desc').value = `Scenic journey across ${regionLabel} with heritage stays and local excursions.`;
+    document.getElementById('studio-desc').value = `Scenic journey across ${regionLabel} with curated stays and activities.`;
     handleRegionChange();
   }
 
-  // Handle Photo Upload (Optional Component)
+  // Handle Photo Upload
   function handlePhotoUpload(e){
     const file = e.target.files[0];
     if(file){
@@ -1443,7 +1681,6 @@
     }
   }
 
-  // Calculate Dates & Duration
   function calculateDates(){
     const startVal = document.getElementById('studio-start-date').value;
     const endVal = document.getElementById('studio-end-date').value;
@@ -1465,7 +1702,6 @@
     updateLivePreview();
   }
 
-  // Dynamic Live Preview Synchronizer
   function updateLivePreview(){
     const name = document.getElementById('studio-trip-name').value || "Expedition Title";
     const region = document.getElementById('studio-region').value;
@@ -1480,17 +1716,11 @@
     document.getElementById('preview-desc-text').textContent = desc;
 
     if(!customUploadedImage){
-      const defaultImg = regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
-      document.getElementById('preview-cover-bg').style.backgroundImage = `url('${defaultImg}')`;
+      document.getElementById('preview-cover-bg').style.backgroundImage = `url('https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80')`;
     }
   }
 
   function handleRegionChange(){
-    const region = document.getElementById('studio-region').value;
-    if(!customUploadedImage){
-      const img = regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
-      document.getElementById('preview-cover-bg').style.backgroundImage = `url('${img}')`;
-    }
     updateLivePreview();
   }
 
@@ -1499,46 +1729,287 @@
     customUploadedImage = "";
     document.getElementById('studio-photo-preview').classList.remove('visible');
     
-    // Set default dates
     const today = new Date();
     const nextWeek = new Date(today.getTime() + 6 * 24 * 60 * 60 * 1000);
     document.getElementById('studio-start-date').value = today.toISOString().split('T')[0];
     document.getElementById('studio-end-date').value = nextWeek.toISOString().split('T')[0];
-    document.getElementById('studio-trip-name').value = "Royal Heritage Exploration";
-    document.getElementById('studio-budget').value = "45000";
-    document.getElementById('studio-desc').value = "Bespoke itinerary including palace tours, private transfers, and local cuisine tastings.";
+    document.getElementById('studio-trip-name').value = "Royal Rajasthan Odyssey";
+    document.getElementById('studio-budget').value = "48000";
+    document.getElementById('studio-desc').value = "Heritage expedition spanning royal palaces, desert stays, and street food markets.";
     
     calculateDates();
     handleRegionChange();
   }
 
-  // Handle Save Trip
-  function handleSaveTrip(e){
+  // Proceed to Screen 5: Initialize stops based on circuit
+  function handleProceedToItinerary(e){
     e.preventDefault();
-    const name = document.getElementById('studio-trip-name').value.trim();
-    const region = document.getElementById('studio-region').value;
-    const startVal = document.getElementById('studio-start-date').value;
-    const endVal = document.getElementById('studio-end-date').value;
-    const pax = parseInt(document.getElementById('studio-pax').value, 10) || 1;
-    const budget = parseFloat(document.getElementById('studio-budget').value) || 0;
-    const desc = document.getElementById('studio-desc').value.trim();
-    
-    const coverPhoto = customUploadedImage || regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
+    activeDraft.name = document.getElementById('studio-trip-name').value.trim();
+    activeDraft.region = document.getElementById('studio-region').value;
+    activeDraft.startDate = document.getElementById('studio-start-date').value;
+    activeDraft.endDate = document.getElementById('studio-end-date').value;
+    activeDraft.pax = parseInt(document.getElementById('studio-pax').value, 10) || 2;
+    activeDraft.budget = parseFloat(document.getElementById('studio-budget').value) || 50000;
+    activeDraft.desc = document.getElementById('studio-desc').value.trim();
+
+    // Default Seed stops for builder demonstration
+    const d1 = new Date(activeDraft.startDate);
+    const mid1 = new Date(d1.getTime() + 2 * 24 * 60 * 60 * 1000);
+    const mid2 = new Date(d1.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+    activeDraft.stops = [
+      {
+        city: "Jaipur, Rajasthan",
+        startDate: activeDraft.startDate,
+        endDate: mid1.toISOString().split('T')[0],
+        activities: [
+          { name: "Explore Amber Fort & Sheesh Mahal", time: "Morning" },
+          { name: "Sunset view at Nahargarh Fort", time: "Evening" }
+        ]
+      },
+      {
+        city: "Udaipur, Rajasthan",
+        startDate: mid2.toISOString().split('T')[0],
+        endDate: activeDraft.endDate,
+        activities: [
+          { name: "Lake Pichola Sunset Boat Ride", time: "Evening" },
+          { name: "City Palace Heritage Tour", time: "Morning" }
+        ]
+      }
+    ];
+
+    navigateToItineraryScreen();
+  }
+
+  /* ========================================================
+     SCREEN 5 ITINERARY BUILDER FUNCTIONS
+     - Add Stop
+     - Select City & Dates
+     - Assign Activities
+     - Reorder Cities (Up / Down)
+     - Real-Time Day-wise Timeline
+     ======================================================== */
+
+  function renderStops(){
+    const container = document.getElementById('stops-list-container');
+    container.innerHTML = '';
+    document.getElementById('itin-total-stops-count').textContent = `${activeDraft.stops.length} Stop${activeDraft.stops.length > 1 ? 's' : ''} Configured`;
+
+    activeDraft.stops.forEach((stop, index) => {
+      const card = document.createElement('div');
+      card.className = 'stop-card';
+
+      // Dropdown options
+      let cityOptionsHtml = allIndianCities.map(c => 
+        `<option value="${c.name}" ${c.name === stop.city ? 'selected' : ''}>${c.name}</option>`
+      ).join('');
+
+      // Activities list html
+      let activitiesHtml = stop.activities.map((act, actIndex) => `
+        <div class="activity-item">
+          <span class="activity-title">✦ ${act.name}</span>
+          <span class="activity-time-tag">${act.time || 'Day Plan'}</span>
+          <button class="remove-act-btn" onclick="removeActivity(${index}, ${actIndex})" title="Remove Activity">&times;</button>
+        </div>
+      `).join('');
+
+      card.innerHTML = `
+        <div class="stop-header">
+          <div class="stop-number-badge">
+            <span class="stop-badge-pill">${index + 1}</span>
+            <span>Stop ${index + 1}: ${stop.city.split(',')[0]}</span>
+          </div>
+
+          <div class="reorder-actions">
+            <button class="reorder-btn" onclick="moveStop(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Move Up">▲ Up</button>
+            <button class="reorder-btn" onclick="moveStop(${index}, 1)" ${index === activeDraft.stops.length - 1 ? 'disabled' : ''} title="Move Down">▼ Down</button>
+            <button class="delete-stop-btn" onclick="deleteStop(${index})" title="Delete Stop">Remove</button>
+          </div>
+        </div>
+
+        <div class="studio-row-2" style="margin-bottom: 12px;">
+          <div class="field">
+            <label>Destination City</label>
+            <select onchange="updateStopCity(${index}, this.value)">
+              ${cityOptionsHtml}
+            </select>
+          </div>
+          <div class="field">
+            <label>Travel Dates for this Stop</label>
+            <div style="display:flex; gap:6px;">
+              <input type="date" value="${stop.startDate}" onchange="updateStopDate(${index}, 'startDate', this.value)" style="font-size:12px;">
+              <input type="date" value="${stop.endDate}" onchange="updateStopDate(${index}, 'endDate', this.value)" style="font-size:12px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Assign Activities Area -->
+        <div class="activities-container">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:'Space Mono', monospace; font-size:10px; text-transform:uppercase; font-weight:700; color:var(--navy);">
+              Assigned Activities (${stop.activities.length})
+            </span>
+            <button onclick="suggestQuickActivities(${index})" style="background:none; border:none; color:var(--gold); font-size:11px; font-weight:700; cursor:pointer;">
+              + Suggest Top City Activities
+            </button>
+          </div>
+
+          ${activitiesHtml || '<div style="font-size:12px; color:var(--muted); font-style:italic;">No activities added yet for this stop.</div>'}
+
+          <div class="add-act-bar">
+            <input type="text" id="act-input-${index}" class="add-act-input" placeholder="Type new activity (e.g. Guided museum tour)...">
+            <select id="act-time-${index}" style="border:1px solid var(--line); border-radius:6px; padding:0 8px; font-size:11px; background:#FFF;">
+              <option value="Morning">Morning</option>
+              <option value="Afternoon">Afternoon</option>
+              <option value="Evening">Evening</option>
+              <option value="All-Day">All-Day</option>
+            </select>
+            <button class="add-act-btn" onclick="addCustomActivity(${index})">+ Add Activity</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  // Add Stop
+  function addNewStop(){
+    const defaultCity = allIndianCities[activeDraft.stops.length % allIndianCities.length];
+    activeDraft.stops.push({
+      city: defaultCity.name,
+      startDate: activeDraft.startDate,
+      endDate: activeDraft.endDate,
+      activities: [
+        { name: defaultCity.defaultActivities[0], time: "Morning" }
+      ]
+    });
+    renderStops();
+    renderTimelinePreview();
+  }
+
+  // Delete Stop
+  function deleteStop(index){
+    if(activeDraft.stops.length <= 1){
+      alert("An itinerary must contain at least one city stop.");
+      return;
+    }
+    activeDraft.stops.splice(index, 1);
+    renderStops();
+    renderTimelinePreview();
+  }
+
+  // Reorder Cities (Up / Down)
+  function moveStop(index, direction){
+    const targetIndex = index + direction;
+    if(targetIndex < 0 || targetIndex >= activeDraft.stops.length) return;
+    const temp = activeDraft.stops[index];
+    activeDraft.stops[index] = activeDraft.stops[targetIndex];
+    activeDraft.stops[targetIndex] = temp;
+    renderStops();
+    renderTimelinePreview();
+  }
+
+  // Update Stop City
+  function updateStopCity(index, newCity){
+    activeDraft.stops[index].city = newCity;
+    renderTimelinePreview();
+  }
+
+  // Update Stop Date
+  function updateStopDate(index, key, val){
+    activeDraft.stops[index][key] = val;
+    renderTimelinePreview();
+  }
+
+  // Add Custom Activity
+  function addCustomActivity(stopIndex){
+    const input = document.getElementById(`act-input-${stopIndex}`);
+    const timeSelect = document.getElementById(`act-time-${stopIndex}`);
+    const actText = input.value.trim();
+    if(!actText) return;
+
+    activeDraft.stops[stopIndex].activities.push({
+      name: actText,
+      time: timeSelect.value
+    });
+    input.value = '';
+    renderStops();
+    renderTimelinePreview();
+  }
+
+  // Remove Activity
+  function removeActivity(stopIndex, actIndex){
+    activeDraft.stops[stopIndex].activities.splice(actIndex, 1);
+    renderStops();
+    renderTimelinePreview();
+  }
+
+  // Suggest Quick Activities
+  function suggestQuickActivities(stopIndex){
+    const currentCityName = activeDraft.stops[stopIndex].city;
+    const found = allIndianCities.find(c => c.name === currentCityName);
+    if(found){
+      found.defaultActivities.forEach(act => {
+        const alreadyExists = activeDraft.stops[stopIndex].activities.some(a => a.name === act);
+        if(!alreadyExists){
+          activeDraft.stops[stopIndex].activities.push({ name: act, time: "Flexible" });
+        }
+      });
+      renderStops();
+      renderTimelinePreview();
+    }
+  }
+
+  // Render Interactive Day-Wise Timeline
+  function renderTimelinePreview(){
+    const container = document.getElementById('timeline-flow-container');
+    container.innerHTML = '';
+
+    if(activeDraft.stops.length === 0){
+      container.innerHTML = '<div style="font-size:12px; color:var(--muted);">No stops defined. Click "+ Add Stop" above.</div>';
+      return;
+    }
+
+    activeDraft.stops.forEach((stop, i) => {
+      const node = document.createElement('div');
+      node.className = 'timeline-node';
+
+      const actsList = stop.activities.map(a => `<div>• <b>[${a.time || 'Day'}]</b> ${a.name}</div>`).join('');
+
+      node.innerHTML = `
+        <div class="timeline-dot"></div>
+        <div class="node-city">Day Block ${i+1}: ${stop.city}</div>
+        <div class="node-dates">${stop.startDate} → ${stop.endDate}</div>
+        <div class="node-acts">${actsList || '<span style="color:var(--muted); font-style:italic;">No activities scheduled yet.</span>'}</div>
+      `;
+      container.appendChild(node);
+    });
+  }
+
+  // Finalize Expedition from Screen 5
+  function finalizeExpedition(){
+    const totalStopsSummary = activeDraft.stops.map((s, idx) => 
+      `Stop ${idx+1}: ${s.city} (${s.startDate} to ${s.endDate}) — Activities: ${s.activities.map(a => a.name).join(', ') || 'Self-guided exploration'}`
+    ).join('\n');
+
+    const primaryCity = activeDraft.stops[0] ? activeDraft.stops[0].city : "India Expedition";
+    const coverPhoto = customUploadedImage || regionImages[primaryCity] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
 
     userTrips.unshift({
-      name,
-      city: region.split(',')[0],
-      region,
+      name: activeDraft.name,
+      city: primaryCity.split(',')[0],
+      region: activeDraft.region,
       days: calculatedTripDays,
-      pax,
-      budget,
-      dates: `${startVal} – ${endVal}`,
-      notes: desc,
+      pax: activeDraft.pax,
+      budget: activeDraft.budget,
+      dates: `${activeDraft.startDate} – ${activeDraft.endDate}`,
+      notes: `${activeDraft.desc}\n\nDay-Wise Stops:\n${totalStopsSummary}`,
       photo: coverPhoto,
-      badge: "Scheduled Expedition"
+      badge: "Confirmed Itinerary"
     });
 
-    alert(`✦ Expedition "${name}" has been successfully saved to your dashboard!`);
+    alert(`✦ Success! "${activeDraft.name}" with all ${activeDraft.stops.length} city stops has been published to your Dashboard!`);
     navigateToDashboard();
   }
 
@@ -1552,7 +2023,7 @@
         <div class="no-trips-box">
           <div style="font-size: 32px; margin-bottom: 8px;">✈️</div>
           <h3 class="no-trips-title">No Active Trips Scheduled</h3>
-          <p class="no-trips-sub">You don't have any saved itineraries yet. Build your first Indian expedition in our dedicated studio!</p>
+          <p class="no-trips-sub">You don't have any saved itineraries yet. Build your multi-city Indian expedition now!</p>
           <button class="plan-trip-btn" onclick="navigateToTripScreen()">+ Create Your First Trip</button>
         </div>
       `;
@@ -1587,7 +2058,7 @@
           </div>
           <div class="trip-footer">
             <span class="trip-budget-tag">Est. ₹${trip.budget.toLocaleString('en-IN')}</span>
-            <span class="trip-link">Review Expedition →</span>
+            <span class="trip-link">Review Full Itinerary →</span>
           </div>
         </div>
       `;
@@ -1602,7 +2073,7 @@
     document.getElementById('stat-total-pax').textContent = `${totalPax} Travelers`;
   }
 
-  // Auth & Sign-in logic
+  // Auth logic
   function switchTab(which){
     const isLogin = which === 'login';
     document.getElementById('tab-login').classList.toggle('active', isLogin);
@@ -1649,35 +2120,21 @@
     if(valid){
       userTrips = [
         {
-          name: "Udaipur Royal Palace & Lake Pichola Retreat",
+          name: "Royal Rajasthan Heritage & Lake Pichola Circuit",
           city: "Udaipur",
-          region: "Udaipur, Rajasthan",
+          region: "Rajasthan Heritage Circuit",
           days: 6,
           pax: 2,
           budget: 68000,
           dates: "2026-11-14 – 2026-11-19",
-          notes: "Luxury Lake View Suite, Pichola Boat Cruise, Sunset Dinner at Jagmandir, City Palace Private Tour.",
+          notes: "Stop 1: Jaipur (Amber Fort, Johari Bazaar)\nStop 2: Udaipur (Lake Pichola Boat Cruise, Sunset Dinner at Jagmandir).",
           photo: regionImages["Udaipur, Rajasthan"],
           badge: "Confirmed · In 10 Days"
-        },
-        {
-          name: "Rishikesh & Ganga White Water Expedition",
-          city: "Rishikesh",
-          region: "Rishikesh, Uttarakhand",
-          days: 4,
-          pax: 4,
-          budget: 32000,
-          dates: "2026-12-22 – 2026-12-26",
-          notes: "Riverside camp booking, 26km Grade IV River Rafting, Cliff jump session, Beatles Ashram visit.",
-          photo: regionImages["Rishikesh, Uttarakhand"],
-          badge: "Planning Phase"
         }
       ];
 
       document.getElementById('user-welcome').textContent = "Welcome back, Aarav.";
-      document.getElementById('auth-stage').style.display = 'none';
-      document.getElementById('dashboard-stage').style.display = 'block';
-      renderDashboard();
+      navigateToDashboard();
     }
   });
 
@@ -1701,15 +2158,12 @@
       userTrips = [];
       document.getElementById('stub-passenger').textContent = name.toUpperCase();
       document.getElementById('user-welcome').textContent = `Welcome, ${name}!`;
-      document.getElementById('auth-stage').style.display = 'none';
-      document.getElementById('dashboard-stage').style.display = 'block';
-      renderDashboard();
+      navigateToDashboard();
     }
   });
 
   function logout(){
-    document.getElementById('dashboard-stage').style.display = 'none';
-    document.getElementById('trip-screen-stage').style.display = 'none';
+    hideAllScreens();
     document.getElementById('auth-stage').style.display = 'grid';
   }
 
@@ -1723,7 +2177,7 @@
     document.getElementById('trip-detail-budget').textContent = budget;
     document.getElementById('trip-detail-party').textContent = party;
     document.getElementById('trip-detail-days').textContent = days;
-    document.getElementById('trip-detail-schedule').textContent = schedule;
+    document.getElementById('trip-detail-schedule').innerHTML = schedule.replace(/\n/g, '<br>');
     openModal('trip-detail-modal');
   }
 
@@ -1736,18 +2190,16 @@
     viewTripDetail('All Active Itineraries Summary', 'Various Dates', document.getElementById('stat-total-budget').textContent, `${document.getElementById('stat-total-pax').textContent}`, `${document.getElementById('stat-total-days').textContent}`, summary);
   }
 
-  // Pan-India Map Markers
+  // Pan-India Map
   const indianCitiesCoords = [
     { name: "Jaipur", region: "Jaipur, Rajasthan", coords: [26.9124, 75.7873], desc: "Pink City & Historic Forts" },
     { name: "Varanasi", region: "Varanasi, Uttar Pradesh", coords: [25.3176, 82.9739], desc: "Sacred Ghats & Cultural Heritage" },
     { name: "Udaipur", region: "Udaipur, Rajasthan", coords: [24.5854, 73.7125], desc: "City of Lakes & Palaces" },
-    { name: "Munnar", region: "Munnar & Alleppey, Kerala", coords: [10.0889, 77.0595], desc: "Emerald Hills & Tea Plantations" },
-    { name: "Goa", region: "Goa (North & South), Goa", coords: [15.2993, 74.1240], desc: "Coastal Sunsets & Heritage" },
-    { name: "Leh-Ladakh", region: "Leh-Ladakh, Ladakh", coords: [34.1526, 77.5771], desc: "High Himalayan Mountain Passes" },
+    { name: "Munnar", region: "Munnar, Kerala", coords: [10.0889, 77.0595], desc: "Emerald Hills & Tea Plantations" },
+    { name: "Goa", region: "Goa (North & South)", coords: [15.2993, 74.1240], desc: "Coastal Sunsets & Heritage" },
+    { name: "Leh-Ladakh", region: "Leh-Ladakh", coords: [34.1526, 77.5771], desc: "High Himalayan Mountain Passes" },
     { name: "Rishikesh", region: "Rishikesh, Uttarakhand", coords: [30.0869, 78.2676], desc: "Ganga Rafting & Ashrams" },
-    { name: "Darjeeling", region: "Darjeeling & Kalimpong, West Bengal", coords: [27.0410, 88.2663], desc: "Himalayan Toy Train & Tea Hills" },
-    { name: "Mumbai", region: "Mumbai, Maharashtra", coords: [19.0760, 72.8777], desc: "Marine Drive & Gateway of India" },
-    { name: "Kaziranga", region: "Kaziranga & Majuli, Assam", coords: [26.5775, 93.1711], desc: "One-Horned Rhino Safari" }
+    { name: "Darjeeling", region: "Darjeeling, West Bengal", coords: [27.0410, 88.2663], desc: "Himalayan Toy Train & Tea Hills" }
   ];
 
   function openIndiaMap(){
@@ -1766,7 +2218,7 @@
             <div style="font-family:'Plus Jakarta Sans',sans-serif;">
               <b style="color:#0A1424; font-size:14px;">${city.name}</b><br>
               <span style="color:#64748B; font-size:12px;">${city.desc}</span><br>
-              <button onclick="closeModal('map-modal'); quickPlanCity('${city.name}', '${city.region}');" style="margin-top:6px; background:#0A1424; color:#FAF7F2; border:none; padding:5px 10px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:600;">Plan in Expedition Studio</button>
+              <button onclick="closeModal('map-modal'); quickPlanCity('${city.name}', '${city.region}');" style="margin-top:6px; background:#0A1424; color:#FAF7F2; border:none; padding:5px 10px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:600;">Plan in Studio</button>
             </div>
           `);
         });
