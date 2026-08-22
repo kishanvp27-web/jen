@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlobeTrotter — Indian Expeditions & Dynamic Studio</title>
+
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --navy: #0A1424;
+    --navy-surface: #101F38;
+    --sand: #FAF7F2;
+    --gold: #D4AF37;
+    --gold-glow: #F3E5AB;
+    --paper: #FFFFFF;
+    --ink: #111A2C;
+    --muted: #64748B;
+    --error: #DC2626;
+    --line: rgba(17, 26, 44, 0.1);
+  }
+
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+
+  body{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: radial-gradient(circle at 50% 20%, #152542 0%, var(--navy) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    color: var(--ink);
+  }
+
+  /* ---- 1. AUTHENTICATION (BOARDING PASS) ---- */
+  .ticket-stage{
+    width: 100%;
+    max-width: 980px;
+    background: var(--paper);
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    position: relative;
+  }
+
+  .stub-divider{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 53.5%;
+    width: 2px;
+    background-image: radial-gradient(circle, var(--navy) 4px, transparent 4px);
+    background-size: 2px 22px;
+    background-repeat: repeat-y;
+    z-index: 20;
+    transform: translateX(-50%);
+  }
+
+  .ticket-stage::before, .ticket-stage::after{
+    content: "";
+    position: absolute;
+    left: 53.5%;
+    width: 24px;
+    height: 24px;
+    background: var(--navy);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 21;
+  }
+  .ticket-stage::before{ top: 0; }
+  .ticket-stage::after{ top: 100%; }
+
+  .stub{
+    position: relative;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    color: var(--sand);
+  }
+
+  .stub-bg{
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(180deg, rgba(10, 20, 36, 0.88) 0%, rgba(10, 20, 36, 0.72) 40%, rgba(10, 20, 36, 0.95) 100%),
+      url('https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=1400&q=85') center/cover no-repeat;
+    z-index: 1;
+  }
+
+  .stub-content{
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .brand{
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+  }
+  .brand span{ color: var(--gold); }
+
+  .eyebrow{
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-glow);
+    margin-top: 6px;
+  }
+
+  .route{ margin: 40px 0; }
+
+  .route-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: 'Fraunces', serif;
+    font-size: 46px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .route-line{
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+    position: relative;
+  }
+
+  .plane-icon{
+    position: absolute;
+    left: 50%;
+    top: -12px;
+    transform: translateX(-50%);
+    font-size: 16px;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+  }
+
+  .route-labels{
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(250, 247, 242, 0.7);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .manifest-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    border-top: 1px solid rgba(250, 247, 242, 0.15);
+    padding-top: 24px;
+  }
+
+  .manifest-item{ display: flex; flex-direction: column; gap: 2px; }
+  .manifest-label{ color: rgba(250, 247, 242, 0.5); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; }
+  .manifest-value{ color: var(--sand); font-weight: 700; font-size: 12px; letter-spacing: 0.05em; }
+
+  .departure-stamp{
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    width: 140px;
+    height: 140px;
+    border: 2px dashed rgba(212, 175, 55, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-16deg);
+    pointer-events: none;
+  }
+
+  .stamp-inner{
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: rgba(212, 175, 55, 0.6);
+    text-align: center;
+    letter-spacing: 0.15em;
+    line-height: 1.6;
+    text-transform: uppercase;
+  }
+
+  .panel{
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .tabs{
+    display: flex;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 30px;
+  }
+
+  .tab{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    padding: 0 0 14px 0;
+    margin-right: 28px;
+    color: rgba(17, 26, 44, 0.4);
+    cursor: pointer;
+    position: relative;
+    font-weight: 700;
+    transition: color 0.2s ease;
+  }
+
+  .tab.active{ color: var(--navy); }
+  .tab.active::after{
+    content: "";
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 100%;
+    height: 2.5px;
+    background: var(--gold);
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .subhead{
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 26px;
+    line-height: 1.5;
+  }
+
+  form{ display: none; flex-direction: column; gap: 16px; }
+  form.active{ display: flex; }
+
+  .field{ display: flex; flex-direction: column; gap: 5px; }
+  .field label{
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  .field input, .field select, .field textarea{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14.5px;
+    padding: 10px 4px;
+    border: none;
+    border-bottom: 1.5px solid var(--line);
+    background: transparent;
+    outline: none;
+    color: var(--navy);
+    transition: border-color 0.2s ease;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus{ border-bottom-color: var(--navy); }
+  .field input.invalid{ border-bottom-color: var(--error); }
+  .field-error{ font-size: 11.5px; color: var(--error); min-height: 14px; margin-top: 2px; }
+
+  .row-between{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5px;
+    margin-top: -4px;
+  }
+
+  .remember{ display: flex; align-items: center; gap: 7px; color: var(--muted); cursor: pointer; }
+  .remember input{ accent-color: var(--navy); }
+  .forgot{ color: var(--muted); text-decoration: none; }
+  .forgot:hover{ color: var(--navy); text-decoration: underline; }
+
+  .submit{
+    margin-top: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--navy);
+    color: var(--sand);
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .submit:hover{ background: #162B4E; }
+  .submit:active{ transform: scale(0.99); }
+
+  .switch-note{
+    margin-top: auto;
+    padding-top: 24px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .switch-note button{
+    background: none;
+    border: none;
+    color: var(--navy);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-size: 13px;
+  }
+
+  /* ---- 2. DASHBOARD / HOME SCREEN ---- */
+  .dashboard-stage{
+    display: none;
+    width: 100%;
+    max-width: 1240px;
+    background: var(--sand);
+    border-radius: 16px;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+    overflow: hidden;
+    color: var(--ink);
+  }
+
+  .dash-nav{
+    background: var(--navy);
+    padding: 18px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .dash-nav .brand{ font-size: 22px; }
+
+  .dash-nav-right{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-tag{
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+  }
+
+  .logout-btn{
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--sand);
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover{ background: rgba(255,255,255,0.1); }
+
+  .dash-body{
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .dash-header{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 24px;
+  }
+
+  .welcome-title{
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.1;
+  }
+  .welcome-sub{
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .quick-actions-bar{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .quick-btn{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    color: var(--navy);
+    padding: 13px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .quick-btn:hover{ background: #F1EBE1; }
+
+  .plan-trip-btn{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 14px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px -6px rgba(212, 175, 55, 0.5);
+    transition: all 0.2s;
+  }
+  .plan-trip-btn:hover{
+    background: #E5C358;
+    transform: translateY(-1px);
+  }
+
+  /* Budget Highlights Bar */
+  .budget-bar{
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px 28px;
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .budget-item{ display: flex; flex-direction: column; gap: 4px; }
+  .budget-item:not(:last-child){ border-right: 1px solid var(--line); }
+
+  .budget-label{
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .budget-val{
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .budget-sub{
+    font-size: 11px;
+    color: #15803D;
+    font-weight: 600;
+  }
+
+  .section-label{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-label a{
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .section-label a:hover{ color: var(--navy); text-decoration: underline; }
+
+  /* Trips Grid Container */
+  .trips-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .trip-card{
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .trip-card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -10px rgba(0,0,0,0.1);
+  }
+
+  .trip-img{
+    height: 160px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+  }
+  .trip-badge{
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(10, 20, 36, 0.85);
+    color: var(--gold-glow);
+    backdrop-filter: blur(4px);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .trip-details{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+  }
+  .trip-name{
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .trip-dates{
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .trip-footer{
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+  .trip-budget-tag{ font-weight: 700; color: var(--navy); }
+  .trip-link{ color: var(--gold); text-decoration: none; font-weight: 700; }
+
+  /* Empty state box for brand new signups */
+  .no-trips-box{
+    grid-column: span 2;
+    background: #FFFFFF;
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .no-trips-title{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .no-trips-sub{
+    font-size: 13px;
+    color: var(--muted);
+    margin: 6px 0 20px 0;
+    max-width: 400px;
+  }
+
+  /* Extended 8-destination grid */
+  .cities-grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .city-card{
+    position: relative;
+    height: 220px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .city-card:hover{ transform: scale(1.02); }
+  .city-card img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .city-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(10, 20, 36, 0.95) 100%);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: var(--sand);
+  }
+  .city-name{ font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; }
+  .city-desc{
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gold-glow);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- 3. FULLY WORKABLE MODALS ---- */
+  .modal-backdrop{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 20, 36, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.active{ display: flex; }
+
+  .modal-card{
+    background: #FFFFFF;
+    width: 100%;
+    max-width: 680px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    animation: modalPop 0.25s ease-out;
+  }
+
+  .modal-card.wide{ max-width: 900px; }
+
+  @keyframes modalPop{
+    from{ transform: scale(0.95); opacity: 0; }
+    to{ transform: scale(1); opacity: 1; }
+  }
+
+  .modal-head{
+    background: var(--navy);
+    color: var(--sand);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-head h3{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+  }
+  .modal-close{
+    background: none;
+    border: none;
+    color: var(--sand);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-body{
+    padding: 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #map-container{
+    height: 440px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 860px){
+    .ticket-stage{ grid-template-columns: 1fr; }
+    .stub-divider, .ticket-stage::before, .ticket-stage::after{ display: none; }
+    .stub{ border-radius: 12px 12px 0 0; padding: 36px 28px; }
+    .route{ margin: 24px 0; }
+    .route-row{ font-size: 36px; }
+    .departure-stamp{ display: none; }
+    .panel{ border-radius: 0 0 12px 12px; padding: 36px 28px; }
+
+    .budget-bar{ grid-template-columns: 1fr 1fr; }
+    .budget-item:nth-child(2){ border-right: none; }
+    .trips-grid{ grid-template-columns: 1fr; }
+    .no-trips-box{ grid-column: span 1; }
+    .cities-grid{ grid-template-columns: repeat(2, 1fr); }
+    .dash-body{ padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 1. AUTHENTICATION (BOARDING PASS) ================= -->
+<div class="ticket-stage" id="auth-stage">
+  
+  <div class="stub-divider"></div>
+
+  <!-- Left: Boarding Pass Stub with HOME -> ??? -->
+  <div class="stub">
+    <div class="stub-bg"></div>
+
+    <div class="stub-content">
+      <div>
+        <div class="brand">Globe<span>Trotter</span></div>
+        <div class="eyebrow">Boarding Pass · Access Card</div>
+      </div>
+
+      <div class="route">
+        <div class="route-row">
+          <span>HOME</span>
+          <div class="route-line">
+            <span class="plane-icon">✈</span>
+          </div>
+          <span>???</span>
+        </div>
+        <div class="route-labels">
+          <span>Origin: Right Here</span>
+          <span>Destination: Undecided</span>
+        </div>
+      </div>
+
+      <div class="manifest-grid">
+        <div class="manifest-item">
+          <span class="manifest-label">Passenger</span>
+          <span class="manifest-value" id="stub-passenger">YOU</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Gate</span>
+          <span class="manifest-value">ITINERARY BUILDER</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Seat</span>
+          <span class="manifest-value">WINDOW (ALWAYS)</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Status</span>
+          <span class="manifest-value">CLEARED FOR PLANNING</span>
+        </div>
+      </div>
+
+      <div class="departure-stamp">
+        <div class="stamp-inner">
+          EST.<br>2026<br>✦<br>DEPARTURES
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Auth Form Panel -->
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Sign in</button>
+      <button class="tab" id="tab-signup" onclick="switchTab('signup')">Create account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="pane-login">
+      <h1>Welcome back</h1>
+      <p class="subhead">Sign in to pick up your itinerary where you left off.</p>
+
+      <form id="login-form" class="active" novalidate>
+        <div class="field">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" autocomplete="email" placeholder="aarav@globetrotter.in" value="aarav@globetrotter.in">
+          <div class="field-error" id="login-email-error"></div>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" value="exploreindia2026">
+          <div class="field-error" id="login-password-error"></div>
+        </div>
+        <div class="row-between">
+          <label class="remember">
+            <input type="checkbox" id="remember" checked> Keep me signed in
+          </label>
+          <a href="#" class="forgot" onclick="showForgot(event)">Forgot password?</a>
+        </div>
+        <button type="submit" class="submit">Sign in to Dashboard</button>
+      </form>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="pane-signup" style="display:none;">
+      <h1>Start your journey</h1>
+      <p class="subhead">Create an account to build your fresh Indian itinerary.</p>
+
+      <form id="signup-form" novalidate>
+        <div class="field">
+          <label for="signup-name">Full name</label>
+          <input type="text" id="signup-name" autocomplete="name" placeholder="Riya Mehta">
+          <div class="field-error" id="signup-name-error"></div>
+        </div>
+        <div class="field">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" autocomplete="email" placeholder="riya@domain.in">
+          <div class="field-error" id="signup-email-error"></div>
+        </div>
+        <div class="field">
+          <label for="signup-password">Create Password</label>
+          <input type="password" id="signup-password" autocomplete="new-password" placeholder="At least 8 characters">
+          <div class="field-error" id="signup-password-error"></div>
+        </div>
+        <button type="submit" class="submit">Create account &amp; Start Fresh</button>
+      </form>
+    </div>
+
+    <div class="switch-note" id="switch-note">
+      New to GlobeTrotter? <button onclick="switchTab('signup')">Create an account</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= 2. DASHBOARD / HOME SCREEN ================= -->
+<div class="dashboard-stage" id="dashboard-stage">
+  
+  <header class="dash-nav">
+    <div class="brand">Globe<span>Trotter</span></div>
+    <div class="dash-nav-right">
+      <span class="nav-tag">India Studio</span>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    
+    <!-- Welcome Header, Quick Actions & "Plan New Trip" -->
+    <div class="dash-header">
+      <div>
+        <h1 class="welcome-title" id="user-welcome">Welcome back, Aarav.</h1>
+        <p class="welcome-sub" id="user-subhead">Central hub showing your upcoming trips, popular Indian cities, and live budgets.</p>
+      </div>
+      
+      <div class="quick-actions-bar">
+        <button class="quick-btn" onclick="openIndiaMap()">🗺️ Open India Map</button>
+        <button class="plan-trip-btn" onclick="openPlanTripModal()">
+          <span>✈</span> Plan New Trip
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Budget Highlights (Computed in INR ₹) -->
+    <div>
+      <div class="section-label">
+        <span>Budget Highlights</span>
+        <span style="font-size: 11px; color: var(--muted);">Currency: INR (₹)</span>
+      </div>
+      
+      <div class="budget-bar">
+        <div class="budget-item">
+          <span class="budget-label">Total Trip Budget</span>
+          <span class="budget-val" id="stat-total-budget">₹0</span>
+          <span class="budget-sub" id="stat-trips-count">0 Active Trips</span>
+        </div>
+        <div class="budget-item">
+          <span class="budget-label">Total Travel Days</span>
+          <span class="budget-val" id="stat-total-days">0 Days</span>
+          <span class="budget-sub">Across Planned Trips</span>
+        </div>
+        <div class="budget-item">
+          <span class="budget-label">Average Cost / Day</span>
+          <span class="budget-val" id="stat-avg-cost">₹0 / day</span>
+          <span class="budget-sub">Computed Daily Budget</span>
+        </div>
+        <div class="budget-item">
+          <span class="budget-label">Total Travelers</span>
+          <span class="budget-val" id="stat-total-pax">0 Travelers</span>
+          <span class="budget-sub">✦ Group Members</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Trips Grid -->
+    <div>
+      <div class="section-label">
+        <span>Recent &amp; Upcoming Trips</span>
+        <a onclick="openAllTripsModal()">View Summary Itineraries →</a>
+      </div>
+
+      <div class="trips-grid" id="trips-grid-container">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </div>
+
+    <!-- 8 Curated Popular Indian Destinations -->
+    <div>
+      <div class="section-label">
+        <span>Popular Indian Destinations &amp; Inspiration</span>
+        <a onclick="openIndiaMap()">Explore Full India Map →</a>
+      </div>
+
+      <div class="cities-grid">
+        <!-- 1. Jaipur -->
+        <div class="city-card" onclick="openCityModal('Jaipur', 'Rajasthan', 'The Pink City renowned for magnificent forts, royal heritage palaces, and lively local bazaar alleys.', 'Amer Fort, Hawa Mahal, Nahargarh Fort Sunset, Chokhi Dhani.', '₹15,000 - ₹35,000 per person')">
+          <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=600&q=80" alt="Jaipur">
+          <div class="city-overlay">
+            <h4 class="city-name">Jaipur</h4>
+            <span class="city-desc">Rajasthan · Heritage &amp; Forts</span>
+          </div>
+        </div>
+
+        <!-- 2. Varanasi -->
+        <div class="city-card" onclick="openCityModal('Varanasi', 'Uttar Pradesh', 'Spiritual heart of India along the sacred Ganges river with timeless Ganga Aarti ceremonies.', 'Dashashwamedh Ghat Aarti, Morning Boat Sunrise, Sarnath Stupa, Blue Lassi.', '₹10,000 - ₹25,000 per person')">
+          <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=600&q=80" alt="Varanasi">
+          <div class="city-overlay">
+            <h4 class="city-name">Varanasi</h4>
+            <span class="city-desc">Uttar Pradesh · Ghats &amp; Culture</span>
+          </div>
+        </div>
+
+        <!-- 3. Munnar -->
+        <div class="city-card" onclick="openCityModal('Munnar', 'Kerala', 'Rolling emerald tea plantations, mist-covered valleys, and soothing hill-station climate.', 'Kolukkumalai Sunrise, Eravikulam National Park, Mattupetty Dam, Spice garden walks.', '₹18,000 - ₹40,000 per person')">
+          <img src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=600&q=80" alt="Munnar">
+          <div class="city-overlay">
+            <h4 class="city-name">Munnar</h4>
+            <span class="city-desc">Kerala · Tea Estates &amp; Hills</span>
+          </div>
+        </div>
+
+        <!-- 4. Goa -->
+        <div class="city-card" onclick="openCityModal('Goa', 'Coastal West', 'Sun-kissed beaches, Portuguese colonial architecture, watersports, and tranquil coastal cafes.', 'Palolem Beach, Chapora Fort, Fontainhas heritage walk, Scuba diving at Grand Island.', '₹20,000 - ₹50,000 per person')">
+          <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa">
+          <div class="city-overlay">
+            <h4 class="city-name">Goa</h4>
+            <span class="city-desc">Coastal · Beaches &amp; Sunsets</span>
+          </div>
+        </div>
+
+        <!-- 5. Leh-Ladakh -->
+        <div class="city-card" onclick="openCityModal('Leh-Ladakh', 'Ladakh', 'High-altitude mountain desert featuring pristine turquoise lakes and ancient Buddhist monasteries.', 'Pangong Tso Lake, Nubra Valley, Khardung La Pass, Thiksey Monastery.', '₹35,000 - ₹75,000 per person')">
+          <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Ladakh">
+          <div class="city-overlay">
+            <h4 class="city-name">Leh-Ladakh</h4>
+            <span class="city-desc">Himalayas · High Passes &amp; Lakes</span>
+          </div>
+        </div>
+
+        <!-- 6. Udaipur -->
+        <div class="city-card" onclick="openCityModal('Udaipur', 'Rajasthan', 'The romantic City of Lakes known for marble palaces, island resorts, and heritage boat rides.', 'City Palace, Lake Pichola cruise, Jagmandir, Saheliyon Ki Bari.', '₹22,000 - ₹55,000 per person')">
+          <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=600&q=80" alt="Udaipur">
+          <div class="city-overlay">
+            <h4 class="city-name">Udaipur</h4>
+            <span class="city-desc">Rajasthan · Lakes &amp; Palaces</span>
+          </div>
+        </div>
+
+        <!-- 7. Rishikesh -->
+        <div class="city-card" onclick="openCityModal('Rishikesh', 'Uttarakhand', 'Yoga capital of the world offering thrilling white water river rafting, cliff jumps, and cafes.', 'White Water Rafting, Laxman Jhula, Beatles Ashram, Triveni Ghat Aarti.', '₹12,000 - ₹28,000 per person')">
+          <img src="https://images.unsplash.com/photo-1592635196078-9ffc8f5f849b?auto=format&fit=crop&w=600&q=80" alt="Rishikesh">
+          <div class="city-overlay">
+            <h4 class="city-name">Rishikesh</h4>
+            <span class="city-desc">Uttarakhand · Rafting &amp; Yoga</span>
+          </div>
+        </div>
+
+        <!-- 8. Darjeeling -->
+        <div class="city-card" onclick="openCityModal('Darjeeling', 'West Bengal', 'Himalayan hill station famed for toy train journeys and morning sunrise vistas of Kanchenjunga.', 'Tiger Hill Sunrise, Batasia Loop, Happy Valley Tea Estate, Himalayan Mountaineering Inst.', '₹16,000 - ₹38,000 per person')">
+          <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80" alt="Darjeeling">
+          <div class="city-overlay">
+            <h4 class="city-name">Darjeeling</h4>
+            <span class="city-desc">West Bengal · Toy Train &amp; Peaks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= 3. INTERACTIVE MODALS ================= -->
+
+<!-- Modal 1: Comprehensive "Plan New Trip" -->
+<div class="modal-backdrop" id="plan-trip-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>✈ Plan a New Indian Expedition</h3>
+      <button class="modal-close" onclick="closeModal('plan-trip-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="new-trip-form" onsubmit="handleCreateTrip(event)" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="field">
+          <label>Destination City</label>
+          <select id="trip-dest-city" required>
+            <option value="Jaipur">Jaipur, Rajasthan</option>
+            <option value="Varanasi">Varanasi, Uttar Pradesh</option>
+            <option value="Munnar">Munnar, Kerala</option>
+            <option value="Goa">Goa (North &amp; South)</option>
+            <option value="Leh-Ladakh">Leh-Ladakh, Himalayas</option>
+            <option value="Udaipur">Udaipur, Rajasthan</option>
+            <option value="Rishikesh">Rishikesh, Uttarakhand</option>
+            <option value="Darjeeling">Darjeeling, West Bengal</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Trip Title / Name</label>
+          <input type="text" id="trip-custom-name" placeholder="e.g. Royal Rajasthan Winter Getaway" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field">
+            <label>Trip Duration (Days)</label>
+            <input type="number" id="trip-custom-days" min="1" max="60" placeholder="e.g. 6" required>
+          </div>
+          <div class="field">
+            <label>Number of Travelers</label>
+            <input type="number" id="trip-custom-pax" min="1" max="30" placeholder="e.g. 2" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Total Budget in INR (₹)</label>
+          <input type="number" id="trip-custom-budget" min="1000" step="500" placeholder="e.g. 45000" required>
+        </div>
+
+        <div class="field">
+          <label>Travel Dates</label>
+          <input type="text" id="trip-custom-dates" placeholder="e.g. Nov 14 – Nov 19, 2026" required>
+        </div>
+
+        <div class="field">
+          <label>Trip Itinerary Notes &amp; Highlights</label>
+          <textarea id="trip-custom-notes" rows="2" placeholder="e.g. Heritage palace suite, private cab booking, and sunset boat tour."></textarea>
+        </div>
+
+        <button type="submit" class="submit">Save &amp; Add Trip to Dashboard</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2: Interactive Leaflet India Map -->
+<div class="modal-backdrop" id="map-modal">
+  <div class="modal-card wide">
+    <div class="modal-head">
+      <h3>🗺️ Interactive India City Explorer Map</h3>
+      <button class="modal-close" onclick="closeModal('map-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:var(--muted);">Click any marker on the map to explore details or plan a trip directly.</p>
+      <div id="map-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3: City Details Modal -->
+<div class="modal-backdrop" id="city-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="city-modal-title">Destination Overview</h3>
+      <button class="modal-close" onclick="closeModal('city-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <span style="font-family:'Space Mono', monospace; font-size:11px; text-transform:uppercase; color:var(--gold); font-weight:700;" id="city-modal-state">State</span>
+        <p style="font-size:14px; line-height:1.6; color:var(--ink); margin-top:8px;" id="city-modal-desc">Description</p>
+      </div>
+
+      <div style="background:var(--sand); padding:16px; border-radius:8px; border:1px solid var(--line);">
+        <div style="font-family:'Space Mono', monospace; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase;">Top Highlights</div>
+        <p style="font-size:13px; color:var(--muted); margin-top:4px;" id="city-modal-highlights"></p>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:16px;">
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Estimated Cost</div>
+          <div style="font-family:'Fraunces', serif; font-size:18px; font-weight:700; color:var(--navy);" id="city-modal-cost">₹0</div>
+        </div>
+        <button class="plan-trip-btn" onclick="planFromCity()">Plan Trip Here ✈</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 4: Trip Details / Itinerary Modal -->
+<div class="modal-backdrop" id="trip-detail-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="trip-detail-title">Trip Itinerary</h3>
+      <button class="modal-close" onclick="closeModal('trip-detail-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; background:var(--sand); padding:16px; border-radius:8px; border:1px solid var(--line);">
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Dates</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-dates">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Budget</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-budget">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Party Size</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-party">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Duration</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-days">-</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'Space Mono', monospace; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; margin-bottom:8px;">Itinerary Schedule &amp; Bookings</div>
+        <p style="font-size:13.5px; line-height:1.6; color:var(--muted);" id="trip-detail-schedule"></p>
+      </div>
+
+      <button class="submit" onclick="closeModal('trip-detail-modal')">Close Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+  // City Cover Photos Map
+  const cityImages = {
+    "Jaipur": "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=800&q=80",
+    "Varanasi": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=800&q=80",
+    "Munnar": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
+    "Goa": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+    "Leh-Ladakh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
+    "Udaipur": "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80",
+    "Rishikesh": "https://images.unsplash.com/photo-1592635196078-9ffc8f5f849b?auto=format&fit=crop&w=800&q=80",
+    "Darjeeling": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80"
+  };
+
+  // State
+  let userTrips = [];
+  let mapInstance = null;
+
+  // Tab switcher in Auth screen
+  function switchTab(which){
+    const isLogin = which === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    document.getElementById('pane-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('pane-signup').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('login-form').classList.toggle('active', isLogin);
+    document.getElementById('signup-form').classList.toggle('active', !isLogin);
+    document.getElementById('switch-note').innerHTML = isLogin
+      ? 'New to GlobeTrotter? <button onclick="switchTab(\'signup\')">Create an account</button>'
+      : 'Already have an account? <button onclick="switchTab(\'login\')">Sign in</button>';
+  }
+
+  function showForgot(e){
+    e.preventDefault();
+    alert('Password reset instructions dispatched to your registered inbox.');
+  }
+
+  function setError(inputId, errorId, message){
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    input.classList.toggle('invalid', !!message);
+    error.textContent = message || '';
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Sign in validation -> Loads sample existing user trips
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if(!emailPattern.test(email)){
+      setError('login-email','login-email-error','Enter a valid email address.');
+      valid = false;
+    } else { setError('login-email','login-email-error',''); }
+
+    if(password.length === 0){
+      setError('login-password','login-password-error','Password is required.');
+      valid = false;
+    } else { setError('login-password','login-password-error',''); }
+
+    if(valid){
+      userTrips = [
+        {
+          name: "Udaipur Royal Palace & Lake Pichola Retreat",
+          city: "Udaipur",
+          days: 6,
+          pax: 2,
+          budget: 68000,
+          dates: "Nov 14 – Nov 19, 2026",
+          notes: "Luxury Lake View Suite, Pichola Boat Cruise, Sunset Dinner at Jagmandir, City Palace Private Tour.",
+          badge: "Confirmed · In 10 Days"
+        },
+        {
+          name: "Rishikesh & Ganga River Rafting Expedition",
+          city: "Rishikesh",
+          days: 4,
+          pax: 4,
+          budget: 32000,
+          dates: "Dec 22 – Dec 26, 2026",
+          notes: "Riverside camp booking, 26km Grade IV River Rafting, Cliff jump session, Beatles Ashram visit.",
+          badge: "Planning Phase"
+        }
+      ];
+
+      document.getElementById('user-welcome').textContent = "Welcome back, Aarav.";
+      document.getElementById('user-subhead').textContent = "You have 2 active journeys scheduled. Where shall we navigate next?";
+      document.getElementById('auth-stage').style.display = 'none';
+      document.getElementById('dashboard-stage').style.display = 'block';
+      renderDashboard();
+    }
+  });
+
+  // Sign up validation -> Brand New User: NO PREVIOUS TRIPS SHOWN
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    if(name.length === 0){ setError('signup-name','signup-name-error','Name is required.'); valid = false; }
+    else { setError('signup-name','signup-name-error',''); }
+
+    if(!emailPattern.test(email)){ setError('signup-email','signup-email-error','Enter a valid email address.'); valid = false; }
+    else { setError('signup-email','signup-email-error',''); }
+
+    if(password.length < 8){ setError('signup-password','signup-password-error','Use at least 8 characters.'); valid = false; }
+    else { setError('signup-password','signup-password-error',''); }
+
+    if(valid){
+      userTrips = []; // Clean state for new signup
+      document.getElementById('stub-passenger').textContent = name.toUpperCase();
+      document.getElementById('user-welcome').textContent = `Welcome, ${name}!`;
+      document.getElementById('user-subhead').textContent = "Your itinerary dashboard is fresh and ready. Plan your first Indian journey below.";
+      document.getElementById('auth-stage').style.display = 'none';
+      document.getElementById('dashboard-stage').style.display = 'block';
+      renderDashboard();
+    }
+  });
+
+  function logout(){
+    document.getElementById('dashboard-stage').style.display = 'none';
+    document.getElementById('auth-stage').style.display = 'grid';
+  }
+
+  // Live Budget & Trips Renderer
+  function renderDashboard(){
+    const container = document.getElementById('trips-grid-container');
+    container.innerHTML = '';
+
+    if(userTrips.length === 0){
+      container.innerHTML = `
+        <div class="no-trips-box">
+          <div style="font-size: 32px; margin-bottom: 8px;">✈️</div>
+          <h3 class="no-trips-title">No Previous Trips Scheduled</h3>
+          <p class="no-trips-sub">You don't have any past or active itineraries yet. Start your first adventure by clicking "Plan New Trip"!</p>
+          <button class="plan-trip-btn" onclick="openPlanTripModal()">+ Plan Your First Trip</button>
+        </div>
+      `;
+
+      document.getElementById('stat-total-budget').textContent = "₹0";
+      document.getElementById('stat-trips-count').textContent = "0 Active Trips";
+      document.getElementById('stat-total-days').textContent = "0 Days";
+      document.getElementById('stat-avg-cost').textContent = "₹0 / day";
+      document.getElementById('stat-total-pax').textContent = "0 Travelers";
+      return;
+    }
+
+    let totalBudget = 0;
+    let totalDays = 0;
+    let totalPax = 0;
+
+    userTrips.forEach((trip, index) => {
+      totalBudget += trip.budget;
+      totalDays += trip.days;
+      totalPax += trip.pax;
+
+      const imgUrl = cityImages[trip.city] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
+
+      const card = document.createElement('div');
+      card.className = 'trip-card';
+      card.onclick = () => viewTripDetail(trip.name, trip.dates, `₹${trip.budget.toLocaleString('en-IN')}`, `${trip.pax} Travelers`, `${trip.days} Days`, trip.notes);
+      card.innerHTML = `
+        <div class="trip-img" style="background-image: url('${imgUrl}');">
+          <span class="trip-badge">${trip.badge}</span>
+        </div>
+        <div class="trip-details">
+          <div>
+            <h3 class="trip-name">${trip.name}</h3>
+            <p class="trip-dates">${trip.dates} · ${trip.days} Days (${trip.pax} Travelers)</p>
+          </div>
+          <div class="trip-footer">
+            <span class="trip-budget-tag">Est. ₹${trip.budget.toLocaleString('en-IN')}</span>
+            <span class="trip-link">Manage Itinerary →</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    const avgCostPerDay = totalDays > 0 ? Math.round(totalBudget / totalDays) : 0;
+
+    document.getElementById('stat-total-budget').textContent = `₹${totalBudget.toLocaleString('en-IN')}`;
+    document.getElementById('stat-trips-count').textContent = `${userTrips.length} Active Trip${userTrips.length > 1 ? 's' : ''}`;
+    document.getElementById('stat-total-days').textContent = `${totalDays} Days`;
+    document.getElementById('stat-avg-cost').textContent = `₹${avgCostPerDay.toLocaleString('en-IN')} / day`;
+    document.getElementById('stat-total-pax').textContent = `${totalPax} Travelers`;
+  }
+
+  // Workable "Plan New Trip" handler
+  function handleCreateTrip(e){
+    e.preventDefault();
+    const city = document.getElementById('trip-dest-city').value;
+    const name = document.getElementById('trip-custom-name').value;
+    const days = parseInt(document.getElementById('trip-custom-days').value, 10) || 1;
+    const pax = parseInt(document.getElementById('trip-custom-pax').value, 10) || 1;
+    const budget = parseFloat(document.getElementById('trip-custom-budget').value) || 0;
+    const dates = document.getElementById('trip-custom-dates').value;
+    const notes = document.getElementById('trip-custom-notes').value || `Bespoke route to ${city} configured.`;
+
+    userTrips.unshift({
+      name,
+      city,
+      days,
+      pax,
+      budget,
+      dates,
+      notes,
+      badge: "Newly Added"
+    });
+
+    renderDashboard();
+    closeModal('plan-trip-modal');
+    document.getElementById('new-trip-form').reset();
+    alert(`Success: "${name}" has been added and your average budget was recalculated!`);
+  }
+
+  // Modal Helpers
+  function openModal(id){ document.getElementById(id).classList.add('active'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+  function openPlanTripModal(){ openModal('plan-trip-modal'); }
+
+  // Workable Trip Detail Trigger
+  function viewTripDetail(title, dates, budget, party, days, schedule){
+    document.getElementById('trip-detail-title').textContent = title;
+    document.getElementById('trip-detail-dates').textContent = dates;
+    document.getElementById('trip-detail-budget').textContent = budget;
+    document.getElementById('trip-detail-party').textContent = party;
+    document.getElementById('trip-detail-days').textContent = days;
+    document.getElementById('trip-detail-schedule').textContent = schedule;
+    openModal('trip-detail-modal');
+  }
+
+  function openAllTripsModal(){
+    if(userTrips.length === 0){
+      alert("No active trips to display. Plan a new trip first!");
+      return;
+    }
+    const summary = userTrips.map((t, i) => `${i+1}. ${t.name} (${t.city}) — ₹${t.budget.toLocaleString('en-IN')} [${t.days} Days]`).join('\n\n');
+    viewTripDetail('All Active Itineraries Summary', 'Various Dates', document.getElementById('stat-total-budget').textContent, `${document.getElementById('stat-total-pax').textContent}`, `${document.getElementById('stat-total-days').textContent}`, summary);
+  }
+
+  // City Modal Trigger
+  let selectedCityForPlan = "Jaipur";
+  function openCityModal(city, state, desc, highlights, cost){
+    selectedCityForPlan = city;
+    document.getElementById('city-modal-title').textContent = city;
+    document.getElementById('city-modal-state').textContent = state;
+    document.getElementById('city-modal-desc').textContent = desc;
+    document.getElementById('city-modal-highlights').textContent = highlights;
+    document.getElementById('city-modal-cost').textContent = cost;
+    openModal('city-modal');
+  }
+
+  function planFromCity(){
+    closeModal('city-modal');
+    document.getElementById('trip-dest-city').value = selectedCityForPlan;
+    document.getElementById('trip-custom-name').value = `${selectedCityForPlan} Curated Journey`;
+    openPlanTripModal();
+  }
+
+  // Interactive Leaflet India Map Coordinates
+  const indianCitiesCoords = [
+    { name: "Jaipur", coords: [26.9124, 75.7873], desc: "Pink City · Forts & Palaces" },
+    { name: "Varanasi", coords: [25.3176, 82.9739], desc: "Ancient Spiritual Ghats" },
+    { name: "Udaipur", coords: [24.5854, 73.7125], desc: "City of Lakes & Palaces" },
+    { name: "Munnar", coords: [10.0889, 77.0595], desc: "Tea Estates & Misty Hills" },
+    { name: "Goa", coords: [15.2993, 74.1240], desc: "Beaches & Coastal Heritage" },
+    { name: "Leh-Ladakh", coords: [34.1526, 77.5771], desc: "High Altitude Himalayan Passes" },
+    { name: "Rishikesh", coords: [30.0869, 78.2676], desc: "River Rafting & Yoga Ghats" },
+    { name: "Darjeeling", coords: [27.0410, 88.2663], desc: "Toy Train & Kanchenjunga Sunrise" }
+  ];
+
+  function openIndiaMap(){
+    openModal('map-modal');
+
+    setTimeout(() => {
+      if(!mapInstance){
+        mapInstance = L.map('map-container').setView([22.5937, 78.9629], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        indianCitiesCoords.forEach(city => {
+          const marker = L.marker(city.coords).addTo(mapInstance);
+          marker.bindPopup(`
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;">
+              <b style="color:#0A1424; font-size:14px;">${city.name}</b><br>
+              <span style="color:#64748B; font-size:12px;">${city.desc}</span><br>
+              <button onclick="closeModal('map-modal'); openCityModal('${city.name}', 'India', '${city.desc}', 'Key landmarks and sightseeing spots', '₹20,000');" style="margin-top:6px; background:#0A1424; color:#FAF7F2; border:none; padding:5px 10px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:600;">Explore Destination</button>
+            </div>
+          `);
+        });
+      } else {
+        mapInstance.invalidateSize();
+      }
+    }, 200);
+  }
+</script>
+
+</body>
+</html>
