@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GlobeTrotter — Indian Expeditions & Dynamic Studio</title>
 
-<!-- Leaflet Map CSS & JS -->
+<!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -288,6 +287,8 @@
   }
 
   .field input:focus, .field select:focus, .field textarea:focus{ border-bottom-color: var(--navy); }
+  .field input.invalid{ border-bottom-color: var(--error); }
+  .field-error{ font-size: 11.5px; color: var(--error); min-height: 14px; margin-top: 2px; }
 
   .row-between{
     display: flex;
@@ -339,7 +340,7 @@
   }
 
   /* ---- 2. DASHBOARD / HOME SCREEN ---- */
-  .dashboard-stage{
+  .dashboard-stage, .trip-screen-stage{
     display: none;
     width: 100%;
     max-width: 1240px;
@@ -515,175 +516,87 @@
     justify-content: space-between;
   }
 
-  /* Trips Grid Container & Cards */
+  .section-label a{
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .section-label a:hover{ color: var(--navy); text-decoration: underline; }
+
+  /* Trips Grid Container */
   .trips-grid{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    gap: 20px;
   }
 
   .trip-card{
     background: #FFFFFF;
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid var(--line);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
   }
   .trip-card:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 20px 35px -10px rgba(10, 20, 36, 0.12);
-  }
-
-  .trip-img-wrap{
-    height: 190px;
-    position: relative;
-    overflow: hidden;
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -10px rgba(0,0,0,0.1);
   }
 
   .trip-img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
+    height: 160px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
   }
-  .trip-card:hover .trip-img{
-    transform: scale(1.04);
-  }
-
-  .trip-badge-top{
+  .trip-badge{
     position: absolute;
-    top: 14px;
-    left: 14px;
-    background: rgba(10, 20, 36, 0.82);
+    top: 12px;
+    left: 12px;
+    background: rgba(10, 20, 36, 0.85);
     color: var(--gold-glow);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
     font-family: 'Space Mono', monospace;
-    font-size: 10.5px;
-    padding: 5px 12px;
-    border-radius: 6px;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-weight: 700;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-  }
-
-  .dest-count-pill{
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--navy);
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 99px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    gap: 5px;
   }
 
   .trip-details{
-    padding: 22px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
     flex: 1;
   }
-
-  .trip-header-info{
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
   .trip-name{
     font-family: 'Fraunces', serif;
-    font-size: 21px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--navy);
-    line-height: 1.25;
   }
-
   .trip-dates{
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    margin-top: 4px;
   }
-
-  .trip-dest-list{
-    font-size: 13px;
-    color: var(--ink);
-    opacity: 0.85;
-    line-height: 1.4;
-    background: #FAF7F2;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border-left: 3px solid var(--gold);
-  }
-
-  .trip-actions-footer{
-    margin-top: auto;
-    padding-top: 16px;
+  .trip-footer{
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--line);
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .trip-budget-tag{
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--navy);
-  }
-
-  .card-action-group{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .btn-action{
     font-family: 'Space Mono', monospace;
     font-size: 11px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
   }
-
-  .btn-view{
-    background: var(--navy);
-    color: var(--sand);
-  }
-  .btn-view:hover{ background: #1a2f52; }
-
-  .btn-edit{
-    background: #EDE8DF;
-    color: var(--navy);
-  }
-  .btn-edit:hover{ background: #DFD7C9; }
-
-  .btn-delete{
-    background: rgba(220, 38, 38, 0.1);
-    color: var(--error);
-  }
-  .btn-delete:hover{ background: rgba(220, 38, 38, 0.2); }
+  .trip-budget-tag{ font-weight: 700; color: var(--navy); }
+  .trip-link{ color: var(--gold); text-decoration: none; font-weight: 700; }
 
   /* Empty state box */
   .no-trips-box{
@@ -752,6 +665,132 @@
     letter-spacing: 0.05em;
   }
 
+  /* ---- 3. TRIP SCREEN (DEDICATED FULL VIEW) ---- */
+  .trip-studio-card{
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  }
+
+  .trip-studio-form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .studio-row-2{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .photo-upload-zone{
+    border: 2px dashed rgba(10, 20, 36, 0.2);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    background: #FAF7F2;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+  .photo-upload-zone:hover{
+    border-color: var(--gold);
+    background: #F5EFE6;
+  }
+  .photo-upload-zone input[type="file"]{
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .photo-preview{
+    width: 100%;
+    height: 180px;
+    border-radius: 8px;
+    object-fit: cover;
+    display: none;
+    margin-top: 10px;
+  }
+  .photo-preview.visible{ display: block; }
+
+  .trip-preview-panel{
+    background: var(--navy-surface);
+    color: var(--sand);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .live-cover-bg{
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.22;
+    filter: blur(1px);
+    transition: background-image 0.3s ease;
+  }
+
+  .preview-content{
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .preview-tag{
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .preview-trip-name{
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin-top: 6px;
+  }
+
+  .preview-meta-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+
+  .preview-meta-item{ display: flex; flex-direction: column; gap: 2px; }
+  .preview-meta-label{ color: rgba(250,247,242,0.5); font-size: 9px; text-transform: uppercase; }
+  .preview-meta-val{ color: var(--gold-glow); font-weight: 700; }
+
   /* Modals */
   .modal-backdrop{
     display: none;
@@ -811,620 +850,931 @@
   }
 
   #map-container{
-    height: 380px;
+    height: 440px;
     width: 100%;
     border-radius: 8px;
     border: 1px solid var(--line);
   }
 
   @media (max-width: 920px){
+    .trip-studio-card{ grid-template-columns: 1fr; }
     .ticket-stage{ grid-template-columns: 1fr; }
     .stub-divider, .ticket-stage::before, .ticket-stage::after{ display: none; }
-    .stub{ border-radius: 12px 12px 0 0; }
-    .panel{ border-radius: 0 0 12px 12px; }
-    .trips-grid, .cities-grid{ grid-template-columns: 1fr; }
+    .stub{ border-radius: 12px 12px 0 0; padding: 36px 28px; }
+    .route{ margin: 24px 0; }
+    .route-row{ font-size: 36px; }
+    .departure-stamp{ display: none; }
+    .panel{ border-radius: 0 0 12px 12px; padding: 36px 28px; }
     .budget-bar{ grid-template-columns: 1fr 1fr; }
-    .budget-item:not(:last-child){ border-right: none; }
+    .budget-item:nth-child(2){ border-right: none; }
+    .trips-grid{ grid-template-columns: 1fr; }
+    .no-trips-box{ grid-column: span 1; }
+    .cities-grid{ grid-template-columns: repeat(2, 1fr); }
+    .dash-body{ padding: 24px; }
   }
 </style>
 </head>
 <body>
 
-  <!-- ================= 1. AUTH SCREEN ================= -->
-  <div class="ticket-stage" id="authStage">
-    <div class="stub">
-      <div class="stub-bg"></div>
-      <div class="stub-content">
-        <div>
-          <div class="brand">Globe<span>Trotter</span></div>
-          <div class="eyebrow">Passport & Expedition Pass</div>
-        </div>
+<!-- ================= 1. AUTHENTICATION (BOARDING PASS) ================= -->
+<div class="ticket-stage" id="auth-stage">
+  <div class="stub-divider"></div>
 
-        <div class="route">
-          <div class="route-row">
-            <span>DEL</span>
-            <div class="route-line"><div class="plane-icon">✈</div></div>
-            <span>BOM</span>
-          </div>
-          <div class="route-labels">
-            <span>New Delhi</span>
-            <span>Mumbai Studio</span>
-          </div>
-        </div>
+  <div class="stub">
+    <div class="stub-bg"></div>
+    <div class="stub-content">
+      <div>
+        <div class="brand">Globe<span>Trotter</span></div>
+        <div class="eyebrow">Boarding Pass · Access Card</div>
+      </div>
 
-        <div class="manifest-grid">
-          <div class="manifest-item">
-            <span class="manifest-label">Expedition Gate</span>
-            <span class="manifest-value">T3 — WEST</span>
-          </div>
-          <div class="manifest-item">
-            <span class="manifest-label">Service Level</span>
-            <span class="manifest-value">First Class Curated</span>
-          </div>
-          <div class="manifest-item">
-            <span class="manifest-label">Curator</span>
-            <span class="manifest-value">Captain S. Sen</span>
-          </div>
-          <div class="manifest-item">
-            <span class="manifest-label">Status</span>
-            <span class="manifest-value" style="color:var(--gold-glow);">Ready to Plan</span>
-          </div>
+      <div class="route">
+        <div class="route-row">
+          <span>HOME</span>
+          <div class="route-line"><span class="plane-icon">✈</span></div>
+          <span>???</span>
+        </div>
+        <div class="route-labels">
+          <span>Origin: Right Here</span>
+          <span>Destination: Undecided</span>
         </div>
       </div>
-      <div class="departure-stamp"><div class="stamp-inner">GlobeTrotter<br>Verified<br>India Expeditions</div></div>
+
+      <div class="manifest-grid">
+        <div class="manifest-item">
+          <span class="manifest-label">Passenger</span>
+          <span class="manifest-value" id="stub-passenger">YOU</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Gate</span>
+          <span class="manifest-value">ITINERARY BUILDER</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Seat</span>
+          <span class="manifest-value">WINDOW (ALWAYS)</span>
+        </div>
+        <div class="manifest-item">
+          <span class="manifest-label">Status</span>
+          <span class="manifest-value">CLEARED FOR PLANNING</span>
+        </div>
+      </div>
+
+      <div class="departure-stamp">
+        <div class="stamp-inner">EST.<br>2026<br>✦<br>DEPARTURES</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Sign in</button>
+      <button class="tab" id="tab-signup" onclick="switchTab('signup')">Create account</button>
     </div>
 
-    <div class="stub-divider"></div>
-
-    <div class="panel">
-      <div class="tabs">
-        <button class="tab active" id="loginTabBtn" onclick="switchAuthTab('login')">Board Flight</button>
-        <button class="tab" id="signupTabBtn" onclick="switchAuthTab('signup')">Issue Passport</button>
-      </div>
-
-      <!-- Log In -->
-      <form id="loginForm" class="active" onsubmit="handleAuthSubmit(event)">
-        <div>
-          <h1>Welcome Back</h1>
-          <p class="subhead">Enter your credentials to access curated journeys.</p>
+    <!-- SIGN IN -->
+    <div id="pane-login">
+      <h1>Welcome back</h1>
+      <p class="subhead">Sign in to pick up your itinerary where you left off.</p>
+      <form id="login-form" class="active" novalidate>
+        <div class="field">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" autocomplete="email" placeholder="aarav@globetrotter.in" value="aarav@globetrotter.in">
+          <div class="field-error" id="login-email-error"></div>
         </div>
         <div class="field">
-          <label>Passport Number / Email</label>
-          <input type="text" id="loginEmail" value="curator@globetrotter.in" required placeholder="curator@globetrotter.in">
-        </div>
-        <div class="field">
-          <label>Security Key / Password</label>
-          <input type="password" id="loginPass" value="••••••••" required placeholder="Enter password">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" value="exploreindia2026">
+          <div class="field-error" id="login-password-error"></div>
         </div>
         <div class="row-between">
-          <label class="remember"><input type="checkbox" checked> Remember Device</label>
-          <a href="#" class="forgot" onclick="alert('Demo Mode: Click Login directly.')">Forgot Key?</a>
+          <label class="remember"><input type="checkbox" id="remember" checked> Keep me signed in</label>
+          <a href="#" class="forgot" onclick="showForgot(event)">Forgot password?</a>
         </div>
-        <button type="submit" class="submit">Access Expedition Deck ➔</button>
-        <div class="switch-note">
-          New explorer? <button type="button" onclick="switchAuthTab('signup')">Register here</button>
-        </div>
+        <button type="submit" class="submit">Sign in to Dashboard</button>
       </form>
+    </div>
 
-      <!-- Sign Up -->
-      <form id="signupForm" onsubmit="handleAuthSubmit(event)">
-        <div>
-          <h1>Issue Passport</h1>
-          <p class="subhead">Craft personalized Indian travel memories.</p>
+    <!-- SIGN UP -->
+    <div id="pane-signup" style="display:none;">
+      <h1>Start your journey</h1>
+      <p class="subhead">Create an account to build your fresh Indian itinerary.</p>
+      <form id="signup-form" novalidate>
+        <div class="field">
+          <label for="signup-name">Full name</label>
+          <input type="text" id="signup-name" autocomplete="name" placeholder="Riya Mehta">
+          <div class="field-error" id="signup-name-error"></div>
         </div>
         <div class="field">
-          <label>Full Explorer Name</label>
-          <input type="text" id="regName" placeholder="e.g., Aarav Sharma" required>
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" autocomplete="email" placeholder="riya@domain.in">
+          <div class="field-error" id="signup-email-error"></div>
         </div>
         <div class="field">
-          <label>Email ID</label>
-          <input type="email" id="regEmail" placeholder="aarav@expedition.in" required>
+          <label for="signup-password">Create Password</label>
+          <input type="password" id="signup-password" autocomplete="new-password" placeholder="At least 8 characters">
+          <div class="field-error" id="signup-password-error"></div>
         </div>
-        <div class="field">
-          <label>Create Security Key</label>
-          <input type="password" id="regPass" placeholder="At least 6 characters" required>
-        </div>
-        <button type="submit" class="submit">Create Passport & Enter ➔</button>
-        <div class="switch-note">
-          Already registered? <button type="button" onclick="switchAuthTab('login')">Log in</button>
-        </div>
+        <button type="submit" class="submit">Create account &amp; Start Fresh</button>
       </form>
+    </div>
+
+    <div class="switch-note" id="switch-note">
+      New to GlobeTrotter? <button onclick="switchTab('signup')">Create an account</button>
     </div>
   </div>
+</div>
 
-  <!-- ================= 2. DASHBOARD / HOME STAGE ================= -->
-  <div class="dashboard-stage" id="dashboardStage">
-    <!-- Navbar -->
-    <div class="dash-nav">
-      <div class="brand">Globe<span>Trotter</span></div>
-      <div class="dash-nav-right">
-        <div class="nav-tag" id="userBadge">Captain S. Sen</div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+<!-- ================= 2. DASHBOARD / HOME SCREEN ================= -->
+<div class="dashboard-stage" id="dashboard-stage">
+  <header class="dash-nav">
+    <div class="brand">Globe<span>Trotter</span></div>
+    <div class="dash-nav-right">
+      <span class="nav-tag">India Studio</span>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <div class="dash-header">
+      <div>
+        <h1 class="welcome-title" id="user-welcome">Welcome back, Aarav.</h1>
+        <p class="welcome-sub" id="user-subhead">Central hub showing your upcoming trips, popular Indian cities, and live budgets.</p>
+      </div>
+      <div class="quick-actions-bar">
+        <button class="quick-btn" onclick="openIndiaMap()">🗺️ Open India Map</button>
+        <button class="plan-trip-btn" onclick="navigateToTripScreen()">
+          <span>✈</span> Plan New Trip
+        </button>
       </div>
     </div>
 
-    <div class="dash-body">
-      <!-- Header Banner -->
-      <div class="dash-header">
-        <div>
-          <div class="welcome-title">My Travel Studio</div>
-          <div class="welcome-sub">Manage your curated itineraries, destinations, and expedition budgets.</div>
-        </div>
-        <div class="quick-actions-bar">
-          <button class="quick-btn" onclick="openMapModal()">🗺 View Interactive Map</button>
-          <button class="plan-trip-btn" onclick="openTripModal()">+ Plan New Expedition</button>
-        </div>
+    <!-- Live Computed Stats -->
+    <div>
+      <div class="section-label">
+        <span>Budget &amp; Travel Highlights</span>
+        <span style="font-size: 11px; color: var(--muted);">Currency: INR (₹)</span>
       </div>
-
-      <!-- Quick Stats -->
       <div class="budget-bar">
         <div class="budget-item">
-          <div class="budget-label">Total Expeditions</div>
-          <div class="budget-val" id="statTripCount">3</div>
-          <div class="budget-sub">Active itineraries</div>
+          <span class="budget-label">Total Trip Budget</span>
+          <span class="budget-val" id="stat-total-budget">₹0</span>
+          <span class="budget-sub" id="stat-trips-count">0 Active Trips</span>
         </div>
         <div class="budget-item">
-          <div class="budget-label">Total Destinations</div>
-          <div class="budget-val" id="statDestCount">8</div>
-          <div class="budget-sub">Across 5 States</div>
+          <span class="budget-label">Total Travel Days</span>
+          <span class="budget-val" id="stat-total-days">0 Days</span>
+          <span class="budget-sub">Across Planned Trips</span>
         </div>
         <div class="budget-item">
-          <div class="budget-label">Cumulative Budget</div>
-          <div class="budget-val" id="statBudget">₹2,85,000</div>
-          <div class="budget-sub">INR Tracked</div>
+          <span class="budget-label">Average Cost / Day</span>
+          <span class="budget-val" id="stat-avg-cost">₹0 / day</span>
+          <span class="budget-sub">Computed Daily Budget</span>
         </div>
         <div class="budget-item">
-          <div class="budget-label">Passport Status</div>
-          <div class="budget-val" style="color:var(--gold);">Verified</div>
-          <div class="budget-sub">All clearances green</div>
+          <span class="budget-label">Total Travelers</span>
+          <span class="budget-val" id="stat-total-pax">0 Travelers</span>
+          <span class="budget-sub">✦ Group Members</span>
         </div>
       </div>
+    </div>
 
-      <!-- Trips Section -->
+    <!-- Active Trips Grid -->
+    <div>
+      <div class="section-label">
+        <span>Recent &amp; Upcoming Trips</span>
+        <a onclick="openAllTripsModal()">View Summary Itineraries →</a>
+      </div>
+      <div class="trips-grid" id="trips-grid-container"></div>
+    </div>
+
+    <!-- Popular Curated Indian Destinations -->
+    <div>
+      <div class="section-label">
+        <span>Popular Indian Destinations &amp; Inspiration</span>
+        <a onclick="openIndiaMap()">Explore Full India Map →</a>
+      </div>
+
+      <div class="cities-grid">
+        <div class="city-card" onclick="quickPlanCity('Jaipur', 'North India (Rajasthan)')">
+          <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=600&q=80" alt="Jaipur">
+          <div class="city-overlay">
+            <h4 class="city-name">Jaipur</h4>
+            <span class="city-desc">Rajasthan · Heritage &amp; Forts</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Varanasi', 'North India (Uttar Pradesh)')">
+          <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=600&q=80" alt="Varanasi">
+          <div class="city-overlay">
+            <h4 class="city-name">Varanasi</h4>
+            <span class="city-desc">Uttar Pradesh · Ghats &amp; Culture</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Munnar', 'South India (Kerala)')">
+          <img src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=600&q=80" alt="Munnar">
+          <div class="city-overlay">
+            <h4 class="city-name">Munnar</h4>
+            <span class="city-desc">Kerala · Tea Estates &amp; Hills</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Goa', 'West Coast')">
+          <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa">
+          <div class="city-overlay">
+            <h4 class="city-name">Goa</h4>
+            <span class="city-desc">Coastal · Beaches &amp; Sunsets</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Leh-Ladakh', 'Himalayas / North')">
+          <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Ladakh">
+          <div class="city-overlay">
+            <h4 class="city-name">Leh-Ladakh</h4>
+            <span class="city-desc">Himalayas · High Passes &amp; Lakes</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Udaipur', 'North India (Rajasthan)')">
+          <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=600&q=80" alt="Udaipur">
+          <div class="city-overlay">
+            <h4 class="city-name">Udaipur</h4>
+            <span class="city-desc">Rajasthan · Lakes &amp; Palaces</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Rishikesh', 'North India (Uttarakhand)')">
+          <img src="https://images.unsplash.com/photo-1592635196078-9ffc8f5f849b?auto=format&fit=crop&w=600&q=80" alt="Rishikesh">
+          <div class="city-overlay">
+            <h4 class="city-name">Rishikesh</h4>
+            <span class="city-desc">Uttarakhand · Rafting &amp; Yoga</span>
+          </div>
+        </div>
+
+        <div class="city-card" onclick="quickPlanCity('Darjeeling', 'East India (West Bengal)')">
+          <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80" alt="Darjeeling">
+          <div class="city-overlay">
+            <h4 class="city-name">Darjeeling</h4>
+            <span class="city-desc">West Bengal · Toy Train &amp; Peaks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 3. DEDICATED TRIP SCREEN / BUILDER ================= -->
+<div class="trip-screen-stage" id="trip-screen-stage">
+  <header class="dash-nav">
+    <div class="brand">Globe<span>Trotter</span></div>
+    <div class="dash-nav-right">
+      <button class="quick-btn" onclick="navigateToDashboard()">← Back to Dashboard</button>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="dash-body">
+    <div class="dash-header">
       <div>
-        <div class="section-label">
-          <span>Active Expeditions & Itineraries</span>
-          <span style="font-size:11px; font-weight: normal; color:var(--muted);">Filter: All Active</span>
+        <h1 class="welcome-title">Expedition Studio</h1>
+        <p class="welcome-sub">Configure and customize your comprehensive Indian travel itinerary.</p>
+      </div>
+      <span class="nav-tag">✦ All Regions of India</span>
+    </div>
+
+    <!-- The 2-Column Trip Studio Card -->
+    <div class="trip-studio-card">
+      
+      <!-- Left Column: Full Form with all requested components -->
+      <form id="studio-trip-form" class="trip-studio-form active" onsubmit="handleSaveTrip(event)">
+        
+        <!-- Region / Area in India -->
+        <div class="field">
+          <label for="studio-region">Select Area / Destination in India</label>
+          <select id="studio-region" onchange="handleRegionChange()" required>
+            <optgroup label="─── NORTH INDIA ───">
+              <option value="Jaipur, Rajasthan">Jaipur — Pink City &amp; Forts (Rajasthan)</option>
+              <option value="Udaipur, Rajasthan">Udaipur — City of Lakes (Rajasthan)</option>
+              <option value="Jodhpur, Rajasthan">Jodhpur — Blue City (Rajasthan)</option>
+              <option value="Varanasi, Uttar Pradesh">Varanasi — Holy Ganges Ghats (Uttar Pradesh)</option>
+              <option value="Agra, Uttar Pradesh">Agra — Taj Mahal &amp; Mughal Heritage</option>
+              <option value="Rishikesh, Uttarakhand">Rishikesh &amp; Haridwar — Yoga &amp; Rafting</option>
+              <option value="Manali &amp; Shimla, Himachal Pradesh">Manali &amp; Shimla — Pine Valleys &amp; Snow</option>
+              <option value="Leh-Ladakh, Ladakh">Leh-Ladakh — High Himalayan Desert</option>
+              <option value="Srinagar &amp; Gulmarg, Kashmir">Srinagar &amp; Gulmarg — Dal Lake &amp; Meadows</option>
+              <option value="Amritsar, Punjab">Amritsar — Golden Temple &amp; Culture</option>
+            </optgroup>
+
+            <optgroup label="─── SOUTH INDIA ───">
+              <option value="Munnar &amp; Alleppey, Kerala">Munnar &amp; Alleppey — Tea Hills &amp; Houseboats</option>
+              <option value="Kochi, Kerala">Kochi — Colonial Fort &amp; Spice Bazaars</option>
+              <option value="Coorg &amp; Kabini, Karnataka">Coorg &amp; Kabini — Coffee Hills &amp; Wildlife</option>
+              <option value="Hampi, Karnataka">Hampi — UNESCO Vijayanagara Ruins</option>
+              <option value="Ooty &amp; Nilgiris, Tamil Nadu">Ooty &amp; Nilgiris — Mountain Railway &amp; Valleys</option>
+              <option value="Madurai &amp; Rameswaram, Tamil Nadu">Madurai &amp; Rameswaram — Dravidian Temples</option>
+              <option value="Pondicherry, UT">Pondicherry — French Quarter &amp; Coastal Promenades</option>
+              <option value="Hyderabad, Telangana">Hyderabad — Nizam Heritage &amp; Charminar</option>
+            </optgroup>
+
+            <optgroup label="─── WEST INDIA &amp; ISLANDS ───">
+              <option value="Goa (North &amp; South), Goa">Goa — Beaches, Forts &amp; Portuguese Heritage</option>
+              <option value="Mumbai, Maharashtra">Mumbai — Gateway of India &amp; Marine Drive</option>
+              <option value="Rann of Kutch, Gujarat">Rann of Kutch — White Salt Desert &amp; Crafts</option>
+              <option value="Gir National Park, Gujarat">Gir — Asiatic Lion Safari (Gujarat)</option>
+              <option value="Andaman &amp; Nicobar Islands, UT">Andaman Islands — Radhanagar Beach &amp; Reefs</option>
+            </optgroup>
+
+            <optgroup label="─── EAST &amp; NORTHEAST INDIA ───">
+              <option value="Darjeeling &amp; Kalimpong, West Bengal">Darjeeling — Kanchenjunga Vistas &amp; Tea</option>
+              <option value="Kolkata, West Bengal">Kolkata — Victoria Memorial &amp; Cultural Hub</option>
+              <option value="Puri &amp; Konark, Odisha">Puri &amp; Konark — Sun Temple &amp; Bay of Bengal</option>
+              <option value="Gangtok &amp; Pelling, Sikkim">Gangtok &amp; North Sikkim — Monasteries &amp; Valleys</option>
+              <option value="Kaziranga &amp; Majuli, Assam">Kaziranga — One-Horned Rhino Safari (Assam)</option>
+              <option value="Shillong &amp; Cherrapunji, Meghalaya">Meghalaya — Living Root Bridges &amp; Waterfalls</option>
+              <option value="Tawang, Arunachal Pradesh">Tawang — Himalayan High Monasteries</option>
+            </optgroup>
+
+            <optgroup label="─── CENTRAL INDIA ───">
+              <option value="Kanha &amp; Bandhavgarh, MP">Kanha &amp; Bandhavgarh — Royal Tiger Reserves</option>
+              <option value="Khajuraho, Madhya Pradesh">Khajuraho &amp; Orchha — Ancient Temple Carvings</option>
+            </optgroup>
+          </select>
         </div>
-        <div class="trips-grid" id="tripsGrid">
-          <!-- Populated by JavaScript -->
+
+        <!-- 1. Trip Name -->
+        <div class="field">
+          <label for="studio-trip-name">Trip Name</label>
+          <input type="text" id="studio-trip-name" placeholder="e.g. Royal Rajasthan Winter Odyssey" oninput="updateLivePreview()" required>
+        </div>
+
+        <!-- 2. Start & End Dates -->
+        <div class="studio-row-2">
+          <div class="field">
+            <label for="studio-start-date">Start Date</label>
+            <input type="date" id="studio-start-date" onchange="calculateDates()" required>
+          </div>
+          <div class="field">
+            <label for="studio-end-date">End Date</label>
+            <input type="date" id="studio-end-date" onchange="calculateDates()" required>
+          </div>
+        </div>
+
+        <!-- Travel Party & Budget -->
+        <div class="studio-row-2">
+          <div class="field">
+            <label for="studio-pax">Number of Travelers</label>
+            <input type="number" id="studio-pax" min="1" max="50" value="2" oninput="updateLivePreview()" required>
+          </div>
+          <div class="field">
+            <label for="studio-budget">Estimated Budget (INR ₹)</label>
+            <input type="number" id="studio-budget" min="1000" step="500" placeholder="e.g. 50000" oninput="updateLivePreview()" required>
+          </div>
+        </div>
+
+        <!-- 3. Trip Description -->
+        <div class="field">
+          <label for="studio-desc">Trip Description &amp; Itinerary Highlights</label>
+          <textarea id="studio-desc" rows="3" placeholder="Describe the journey, special stays, food walks, train bookings, or adventure plans..." oninput="updateLivePreview()"></textarea>
+        </div>
+
+        <!-- 4. Cover Photo Upload (Optional) -->
+        <div class="field">
+          <label>Cover Photo Upload (Optional)</label>
+          <div class="photo-upload-zone" id="upload-dropzone">
+            <input type="file" id="studio-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">
+            <span style="font-size:24px; margin-bottom:6px;">📷</span>
+            <div style="font-size:12px; font-weight:700; color:var(--navy);">Click to Upload Photo or Drag &amp; Drop</div>
+            <div style="font-size:10px; color:var(--muted); margin-top:2px;">PNG, JPG, WebP up to 10MB (Defaults to curated city visual)</div>
+            <img id="studio-photo-preview" class="photo-preview" alt="Preview">
+          </div>
+        </div>
+
+        <!-- 5. Save Button -->
+        <button type="submit" class="submit" style="padding: 16px; font-size: 13px;">✦ Save &amp; Publish Expedition</button>
+      </form>
+
+      <!-- Right Column: Real-Time Interactive Boarding Card Preview -->
+      <div class="trip-preview-panel">
+        <div class="live-cover-bg" id="preview-cover-bg"></div>
+        <div class="preview-content">
+          <div>
+            <div class="preview-tag" id="preview-badge">Live Draft Preview</div>
+            <h2 class="preview-trip-name" id="preview-title">Royal Rajasthan Winter Odyssey</h2>
+            <div style="font-family:'Space Mono', monospace; font-size:11px; color:var(--gold); margin-top:4px;" id="preview-dest">Jaipur, Rajasthan</div>
+          </div>
+
+          <div class="preview-meta-grid">
+            <div class="preview-meta-item">
+              <span class="preview-meta-label">Schedule Window</span>
+              <span class="preview-meta-val" id="preview-dates-text">Dates not set</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="preview-meta-label">Total Duration</span>
+              <span class="preview-meta-val" id="preview-duration-text">0 Days</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="preview-meta-label">Party Size</span>
+              <span class="preview-meta-val" id="preview-pax-text">2 Travelers</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="preview-meta-label">Total Budget</span>
+              <span class="preview-meta-val" id="preview-budget-text">₹0</span>
+            </div>
+          </div>
+
+          <div>
+            <span class="preview-meta-label" style="display:block; margin-bottom:4px;">Description Snippet</span>
+            <p style="font-size:12.5px; line-height:1.5; color:rgba(250,247,242,0.85); font-style:italic;" id="preview-desc-text">
+              No description entered yet. Type in the form to watch your live boarding card update!
+            </p>
+          </div>
+
+          <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:14px; display:flex; justify-content:space-between; font-family:'Space Mono', monospace; font-size:10px; color:rgba(250,247,242,0.6);">
+            <span>STATUS: READY TO SAVE</span>
+            <span>SYSTEM: GLOBETROTTER IN</span>
+          </div>
         </div>
       </div>
 
-      <!-- Featured Destinations Section -->
+    </div>
+  </div>
+</div>
+
+<!-- ================= 4. MODALS ================= -->
+
+<!-- Modal: Interactive Leaflet Map -->
+<div class="modal-backdrop" id="map-modal">
+  <div class="modal-card wide">
+    <div class="modal-head">
+      <h3>🗺️ Pan-India Explorer Map</h3>
+      <button class="modal-close" onclick="closeModal('map-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:var(--muted);">Click any pin on the map to jump directly into the Expedition Builder for that region.</p>
+      <div id="map-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Trip Details / Review -->
+<div class="modal-backdrop" id="trip-detail-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="trip-detail-title">Trip Itinerary</h3>
+      <button class="modal-close" onclick="closeModal('trip-detail-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; background:var(--sand); padding:16px; border-radius:8px; border:1px solid var(--line);">
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Dates</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-dates">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Budget</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-budget">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Party Size</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-party">-</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono', monospace; font-size:10px; color:var(--muted); text-transform:uppercase;">Duration</div>
+          <div style="font-size:13px; font-weight:700; color:var(--navy);" id="trip-detail-days">-</div>
+        </div>
+      </div>
+
       <div>
-        <div class="section-label">
-          <span>Iconic Indian Heritage Gems</span>
-          <a onclick="alert('Discovering curated Indian routes...')">Browse all 100+ cities ➔</a>
-        </div>
-        <div class="cities-grid">
-          <div class="city-card" onclick="quickAddTrip('Royal Rajasthan Odyssey', 'Jaipur, Udaipur, Jodhpur', '₹85,000', 'https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80')">
-            <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80" alt="Jaipur">
-            <div class="city-overlay">
-              <div class="city-name">Jaipur</div>
-              <div class="city-desc">Pink City • Palaces & Forts</div>
-            </div>
-          </div>
-
-          <div class="city-card" onclick="quickAddTrip('Serene Kerala Backwaters', 'Alleppey, Munnar, Kochi', '₹65,000', 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80')">
-            <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80" alt="Alleppey">
-            <div class="city-overlay">
-              <div class="city-name">Alleppey</div>
-              <div class="city-desc">Houseboats • Palm Canals</div>
-            </div>
-          </div>
-
-          <div class="city-card" onclick="quickAddTrip('Himalayan Heights', 'Leh, Nubra, Pangong', '₹95,000', 'https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80')">
-            <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80" alt="Ladakh">
-            <div class="city-overlay">
-              <div class="city-name">Ladakh</div>
-              <div class="city-desc">High Passes • Monasteries</div>
-            </div>
-          </div>
-
-          <div class="city-card" onclick="quickAddTrip('Spiritual Ghats', 'Varanasi, Sarnath', '₹40,000', 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=800&q=80')">
-            <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=800&q=80" alt="Varanasi">
-            <div class="city-overlay">
-              <div class="city-name">Varanasi</div>
-              <div class="city-desc">Ganga Aarti • Ancient City</div>
-            </div>
-          </div>
-        </div>
+        <div style="font-family:'Space Mono', monospace; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; margin-bottom:8px;">Itinerary Schedule &amp; Description</div>
+        <p style="font-size:13.5px; line-height:1.6; color:var(--muted);" id="trip-detail-schedule"></p>
       </div>
+
+      <button class="submit" onclick="closeModal('trip-detail-modal')">Close Review</button>
     </div>
   </div>
+</div>
 
-  <!-- ================= 3. TRIP EDIT/CREATE MODAL ================= -->
-  <div class="modal-backdrop" id="tripModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3 id="tripModalTitle">Plan New Expedition</h3>
-        <button class="modal-close" onclick="closeTripModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <form id="tripForm" style="display:flex; flex-direction:column; gap:16px;" onsubmit="saveTrip(event)">
-          <input type="hidden" id="editTripId">
-          <div class="field">
-            <label>Expedition / Trip Name</label>
-            <input type="text" id="tripNameInput" placeholder="e.g., Royal Rajasthan Circuit" required>
-          </div>
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-            <div class="field">
-              <label>Start Date</label>
-              <input type="date" id="tripStartDate" required>
-            </div>
-            <div class="field">
-              <label>End Date</label>
-              <input type="date" id="tripEndDate" required>
-            </div>
-          </div>
+<script>
+  // Regional Default Imagery Cache
+  const regionImages = {
+    "Jaipur, Rajasthan": "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=800&q=80",
+    "Udaipur, Rajasthan": "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80",
+    "Jodhpur, Rajasthan": "https://images.unsplash.com/photo-1588714477688-cf28a50e94f7?auto=format&fit=crop&w=800&q=80",
+    "Varanasi, Uttar Pradesh": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=800&q=80",
+    "Agra, Uttar Pradesh": "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80",
+    "Rishikesh, Uttarakhand": "https://images.unsplash.com/photo-1592635196078-9ffc8f5f849b?auto=format&fit=crop&w=800&q=80",
+    "Manali & Shimla, Himachal Pradesh": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80",
+    "Leh-Ladakh, Ladakh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
+    "Srinagar & Gulmarg, Kashmir": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&w=800&q=80",
+    "Amritsar, Punjab": "https://images.unsplash.com/photo-1588096344356-9b519d08e5e6?auto=format&fit=crop&w=800&q=80",
+    "Munnar & Alleppey, Kerala": "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
+    "Kochi, Kerala": "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80",
+    "Coorg & Kabini, Karnataka": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
+    "Hampi, Karnataka": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80",
+    "Ooty & Nilgiris, Tamil Nadu": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
+    "Madurai & Rameswaram, Tamil Nadu": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
+    "Pondicherry, UT": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
+    "Hyderabad, Telangana": "https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=800&q=80",
+    "Goa (North & South), Goa": "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
+    "Mumbai, Maharashtra": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80",
+    "Rann of Kutch, Gujarat": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=80",
+    "Gir National Park, Gujarat": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
+    "Andaman & Nicobar Islands, UT": "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=80",
+    "Darjeeling & Kalimpong, West Bengal": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
+    "Kolkata, West Bengal": "https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=800&q=80",
+    "Puri & Konark, Odisha": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80",
+    "Gangtok & Pelling, Sikkim": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80",
+    "Kaziranga & Majuli, Assam": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
+    "Shillong & Cherrapunji, Meghalaya": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    "Tawang, Arunachal Pradesh": "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80",
+    "Kanha & Bandhavgarh, MP": "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80",
+    "Khajuraho, Madhya Pradesh": "https://images.unsplash.com/photo-1600100397608-f010f443b2f5?auto=format&fit=crop&w=800&q=80"
+  };
 
-          <div class="field">
-            <label>Destinations (Comma separated)</label>
-            <input type="text" id="tripDestinations" placeholder="Jaipur, Jodhpur, Udaipur" required>
-          </div>
+  let userTrips = [];
+  let mapInstance = null;
+  let customUploadedImage = "";
+  let calculatedTripDays = 6;
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-            <div class="field">
-              <label>Estimated Budget (₹)</label>
-              <input type="text" id="tripBudget" placeholder="₹75,000" required>
-            </div>
-            <div class="field">
-              <label>Cover Photo URL</label>
-              <input type="url" id="tripImage" placeholder="https://images.unsplash.com/..." required>
-            </div>
-          </div>
+  // View Navigation
+  function navigateToTripScreen(){
+    document.getElementById('dashboard-stage').style.display = 'none';
+    document.getElementById('trip-screen-stage').style.display = 'block';
+    resetStudioForm();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-          <div class="field">
-            <label>Curator Notes & Activities</label>
-            <textarea id="tripNotes" rows="3" style="border:1px solid var(--line); padding:10px; border-radius:6px; font-family:'Plus Jakarta Sans';" placeholder="Special permits, boutique heritage stays, sunset spots..."></textarea>
-          </div>
+  function navigateToDashboard(){
+    document.getElementById('trip-screen-stage').style.display = 'none';
+    document.getElementById('dashboard-stage').style.display = 'block';
+    renderDashboard();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-          <button type="submit" class="submit" style="margin-top:8px;">Save Expedition ➔</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= 4. TRIP DETAIL VIEW MODAL ================= -->
-  <div class="modal-backdrop" id="viewModal">
-    <div class="modal-card wide">
-      <div class="modal-head">
-        <h3 id="viewModalTitle">Expedition Details</h3>
-        <button class="modal-close" onclick="closeViewModal()">✕</button>
-      </div>
-      <div class="modal-body" id="viewModalBody">
-        <!-- Rendered by JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= 5. INTERACTIVE MAP MODAL ================= -->
-  <div class="modal-backdrop" id="mapModal">
-    <div class="modal-card wide">
-      <div class="modal-head">
-        <h3>Expedition Geo-Tracker</h3>
-        <button class="modal-close" onclick="closeMapModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div id="map-container"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Initial Trips Data
-    let trips = [
-      {
-        id: 1,
-        name: "Royal Rajasthan & Thar Odyssey",
-        startDate: "2026-10-10",
-        endDate: "2026-10-18",
-        destinations: ["Jaipur", "Jodhpur", "Udaipur", "Jaisalmer"],
-        budget: "₹95,000",
-        image: "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=900&q=80",
-        notes: "Explore Amber Fort, private desert camp under the stars in Sam Sand Dunes, and boat cruise along Lake Pichola."
-      },
-      {
-        id: 2,
-        name: "Kashmir & Great Lakes Trek",
-        startDate: "2026-09-05",
-        endDate: "2026-09-12",
-        destinations: ["Srinagar", "Gulmarg", "Pahalgam"],
-        budget: "₹72,000",
-        image: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=900&q=80",
-        notes: "Dal Lake Shikara sunrise, Gondola ride phase 2 at Apharwat peak, saffron valley excursions."
-      },
-      {
-        id: 3,
-        name: "Backwaters & Spice Coast",
-        startDate: "2026-11-20",
-        endDate: "2026-11-27",
-        destinations: ["Kochi", "Munnar", "Alleppey"],
-        budget: "₹58,000",
-        image: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=900&q=80",
-        notes: "Private wooden kettuvallam cruise, Kathakali evening in Fort Kochi, and tea garden walking trail."
+  function quickPlanCity(cityName, regionLabel){
+    navigateToTripScreen();
+    const select = document.getElementById('studio-region');
+    for(let i=0; i<select.options.length; i++){
+      if(select.options[i].text.includes(cityName)){
+        select.selectedIndex = i;
+        break;
       }
-    ];
-
-    let leafletMap = null;
-
-    // --- Tab Switcher for Authentication ---
-    function switchAuthTab(tab){
-      document.getElementById('loginTabBtn').classList.toggle('active', tab === 'login');
-      document.getElementById('signupTabBtn').classList.toggle('active', tab === 'signup');
-      document.getElementById('loginForm').classList.toggle('active', tab === 'login');
-      document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
     }
+    document.getElementById('studio-trip-name').value = `${cityName} Expedition`;
+    document.getElementById('studio-desc').value = `Scenic journey across ${regionLabel} with heritage stays and local excursions.`;
+    handleRegionChange();
+  }
 
-    // --- Auth Handler ---
-    function handleAuthSubmit(e){
-      e.preventDefault();
-      document.getElementById('authStage').style.display = 'none';
-      document.getElementById('dashboardStage').style.display = 'block';
-      renderTrips();
-      updateStats();
+  // Handle Photo Upload (Optional Component)
+  function handlePhotoUpload(e){
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(event){
+        customUploadedImage = event.target.result;
+        const preview = document.getElementById('studio-photo-preview');
+        preview.src = customUploadedImage;
+        preview.classList.add('visible');
+        document.getElementById('preview-cover-bg').style.backgroundImage = `url('${customUploadedImage}')`;
+      };
+      reader.readAsDataURL(file);
     }
+  }
 
-    function logout(){
-      document.getElementById('dashboardStage').style.display = 'none';
-      document.getElementById('authStage').style.display = 'grid';
-    }
-
-    // --- Format Date Helpers ---
-    function formatDateRange(start, end){
-      if(!start || !end) return "Dates unassigned";
-      const s = new Date(start);
-      const e = new Date(end);
-      const opts = { month: 'short', day: 'numeric', year: 'numeric' };
-      return `${s.toLocaleDateString('en-US', opts)} — ${e.toLocaleDateString('en-US', opts)}`;
-    }
-
-    // --- Render Trips Cards ---
-    function renderTrips(){
-      const container = document.getElementById('tripsGrid');
-      container.innerHTML = '';
-
-      if(trips.length === 0){
-        container.innerHTML = `
-          <div class="no-trips-box">
-            <div class="no-trips-title">No Expeditions Planned Yet</div>
-            <div class="no-trips-sub">Start drafting your itinerary to track flights, routes, destinations and budgets.</div>
-            <button class="plan-trip-btn" onclick="openTripModal()">+ Plan First Expedition</button>
-          </div>
-        `;
-        return;
-      }
-
-      trips.forEach(trip => {
-        const destCount = trip.destinations.length;
-        const destText = trip.destinations.join(' • ');
-
-        const card = document.createElement('div');
-        card.className = 'trip-card';
-        card.innerHTML = `
-          <div class="trip-img-wrap">
-            <img src="${trip.image}" alt="${trip.name}" class="trip-img" onerror="this.src='https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80'">
-            <div class="trip-badge-top">Curated Route</div>
-            <div class="dest-count-pill">📍 ${destCount} Destination${destCount > 1 ? 's' : ''}</div>
-          </div>
-          
-          <div class="trip-details">
-            <div class="trip-header-info">
-              <h4 class="trip-name">${trip.name}</h4>
-              <div class="trip-dates">🗓 ${formatDateRange(trip.startDate, trip.endDate)}</div>
-            </div>
-
-            <div class="trip-dest-list">
-              <strong>Route:</strong> ${destText}
-            </div>
-
-            <div class="trip-actions-footer">
-              <div class="trip-budget-tag">${trip.budget}</div>
-              <div class="card-action-group">
-                <button class="btn-action btn-view" onclick="viewTrip(${trip.id})">View</button>
-                <button class="btn-action btn-edit" onclick="editTrip(${trip.id})">Edit</button>
-                <button class="btn-action btn-delete" onclick="deleteTrip(${trip.id})">Delete</button>
-              </div>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // --- Stats Update ---
-    function updateStats(){
-      document.getElementById('statTripCount').innerText = trips.length;
-      let allDest = new Set();
-      trips.forEach(t => t.destinations.forEach(d => allDest.add(d.trim())));
-      document.getElementById('statDestCount').innerText = allDest.size;
-    }
-
-    // --- Modal Actions (Create / Edit / View / Delete) ---
-    function openTripModal(isEdit = false){
-      document.getElementById('tripModalTitle').innerText = isEdit ? 'Edit Expedition Itinerary' : 'Plan New Expedition';
-      document.getElementById('tripModal').classList.add('active');
-    }
-
-    function closeTripModal(){
-      document.getElementById('tripModal').classList.remove('active');
-      document.getElementById('tripForm').reset();
-      document.getElementById('editTripId').value = '';
-    }
-
-    function editTrip(id){
-      const trip = trips.find(t => t.id === id);
-      if(!trip) return;
-
-      document.getElementById('editTripId').value = trip.id;
-      document.getElementById('tripNameInput').value = trip.name;
-      document.getElementById('tripStartDate').value = trip.startDate;
-      document.getElementById('tripEndDate').value = trip.endDate;
-      document.getElementById('tripDestinations').value = trip.destinations.join(', ');
-      document.getElementById('tripBudget').value = trip.budget;
-      document.getElementById('tripImage').value = trip.image;
-      document.getElementById('tripNotes').value = trip.notes || '';
-
-      openTripModal(true);
-    }
-
-    function saveTrip(e){
-      e.preventDefault();
-      const id = document.getElementById('editTripId').value;
-      const name = document.getElementById('tripNameInput').value;
-      const startDate = document.getElementById('tripStartDate').value;
-      const endDate = document.getElementById('tripEndDate').value;
-      const destRaw = document.getElementById('tripDestinations').value;
-      const budget = document.getElementById('tripBudget').value;
-      const image = document.getElementById('tripImage').value;
-      const notes = document.getElementById('tripNotes').value;
-
-      const destinations = destRaw.split(',').map(d => d.trim()).filter(d => d.length > 0);
-
-      if(id){
-        // Update existing
-        const index = trips.findIndex(t => t.id == id);
-        if(index > -1){
-          trips[index] = { ...trips[index], name, startDate, endDate, destinations, budget, image, notes };
-        }
+  // Calculate Dates & Duration
+  function calculateDates(){
+    const startVal = document.getElementById('studio-start-date').value;
+    const endVal = document.getElementById('studio-end-date').value;
+    if(startVal && endVal){
+      const d1 = new Date(startVal);
+      const d2 = new Date(endVal);
+      const diffTime = d2 - d1;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      
+      if(diffDays > 0){
+        calculatedTripDays = diffDays;
+        document.getElementById('preview-duration-text').textContent = `${diffDays} Day${diffDays > 1 ? 's' : ''}`;
+        document.getElementById('preview-dates-text').textContent = `${startVal} to ${endVal}`;
       } else {
-        // Create new
-        const newTrip = {
-          id: Date.now(),
-          name,
-          startDate,
-          endDate,
-          destinations,
-          budget,
-          image,
-          notes
-        };
-        trips.unshift(newTrip);
-      }
-
-      closeTripModal();
-      renderTrips();
-      updateStats();
-    }
-
-    function deleteTrip(id){
-      if(confirm('Are you sure you want to remove this expedition from your studio?')){
-        trips = trips.filter(t => t.id !== id);
-        renderTrips();
-        updateStats();
+        alert("End Date cannot precede Start Date.");
+        document.getElementById('studio-end-date').value = "";
       }
     }
+    updateLivePreview();
+  }
 
-    function viewTrip(id){
-      const trip = trips.find(t => t.id === id);
-      if(!trip) return;
+  // Dynamic Live Preview Synchronizer
+  function updateLivePreview(){
+    const name = document.getElementById('studio-trip-name').value || "Expedition Title";
+    const region = document.getElementById('studio-region').value;
+    const pax = document.getElementById('studio-pax').value || 1;
+    const budget = parseFloat(document.getElementById('studio-budget').value) || 0;
+    const desc = document.getElementById('studio-desc').value || "No description provided yet.";
 
-      const body = document.getElementById('viewModalBody');
-      body.innerHTML = `
-        <div style="position:relative; height:240px; border-radius:10px; overflow:hidden;">
-          <img src="${trip.image}" style="width:100%; height:100%; object-fit:cover;">
-          <div style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(10,20,36,0.9) 0%, transparent 60%); padding:20px; display:flex; flex-direction:column; justify-content:flex-end;">
-            <span style="font-family:'Space Mono'; color:var(--gold-glow); font-size:11px; text-transform:uppercase;">Curated Expedition</span>
-            <h2 style="font-family:'Fraunces'; color:#FFF; font-size:26px;">${trip.name}</h2>
-          </div>
-        </div>
+    document.getElementById('preview-title').textContent = name;
+    document.getElementById('preview-dest').textContent = region;
+    document.getElementById('preview-pax-text').textContent = `${pax} Traveler${pax > 1 ? 's' : ''}`;
+    document.getElementById('preview-budget-text').textContent = `₹${budget.toLocaleString('en-IN')}`;
+    document.getElementById('preview-desc-text').textContent = desc;
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; background:#FAF7F2; padding:18px; border-radius:10px;">
-          <div>
-            <div style="font-family:'Space Mono'; font-size:10px; color:var(--muted); text-transform:uppercase;">Date Window</div>
-            <div style="font-weight:700; font-size:14px; margin-top:2px;">${formatDateRange(trip.startDate, trip.endDate)}</div>
-          </div>
-          <div>
-            <div style="font-family:'Space Mono'; font-size:10px; color:var(--muted); text-transform:uppercase;">Allocated Budget</div>
-            <div style="font-weight:700; font-size:14px; color:var(--gold); margin-top:2px;">${trip.budget}</div>
-          </div>
-        </div>
+    if(!customUploadedImage){
+      const defaultImg = regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
+      document.getElementById('preview-cover-bg').style.backgroundImage = `url('${defaultImg}')`;
+    }
+  }
 
-        <div>
-          <h4 style="font-family:'Space Mono'; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Destinations Included (${trip.destinations.length})</h4>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            ${trip.destinations.map(d => `<span style="background:var(--navy); color:var(--sand); font-family:'Space Mono'; font-size:11px; padding:6px 12px; border-radius:6px;">📍 ${d}</span>`).join('')}
-          </div>
-        </div>
+  function handleRegionChange(){
+    const region = document.getElementById('studio-region').value;
+    if(!customUploadedImage){
+      const img = regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
+      document.getElementById('preview-cover-bg').style.backgroundImage = `url('${img}')`;
+    }
+    updateLivePreview();
+  }
 
-        <div>
-          <h4 style="font-family:'Space Mono'; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Curator & Route Notes</h4>
-          <p style="font-size:14px; line-height:1.6; color:var(--muted); background:#FFF; border:1px solid var(--line); padding:16px; border-radius:8px;">
-            ${trip.notes || 'No custom notes provided for this expedition yet.'}
-          </p>
-        </div>
+  function resetStudioForm(){
+    document.getElementById('studio-trip-form').reset();
+    customUploadedImage = "";
+    document.getElementById('studio-photo-preview').classList.remove('visible');
+    
+    // Set default dates
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 6 * 24 * 60 * 60 * 1000);
+    document.getElementById('studio-start-date').value = today.toISOString().split('T')[0];
+    document.getElementById('studio-end-date').value = nextWeek.toISOString().split('T')[0];
+    document.getElementById('studio-trip-name').value = "Royal Heritage Exploration";
+    document.getElementById('studio-budget').value = "45000";
+    document.getElementById('studio-desc').value = "Bespoke itinerary including palace tours, private transfers, and local cuisine tastings.";
+    
+    calculateDates();
+    handleRegionChange();
+  }
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
-          <button class="btn-action btn-edit" style="padding:10px 20px;" onclick="closeViewModal(); editTrip(${trip.id});">Edit Expedition</button>
-          <button class="btn-action btn-view" style="padding:10px 20px;" onclick="closeViewModal();">Close</button>
+  // Handle Save Trip
+  function handleSaveTrip(e){
+    e.preventDefault();
+    const name = document.getElementById('studio-trip-name').value.trim();
+    const region = document.getElementById('studio-region').value;
+    const startVal = document.getElementById('studio-start-date').value;
+    const endVal = document.getElementById('studio-end-date').value;
+    const pax = parseInt(document.getElementById('studio-pax').value, 10) || 1;
+    const budget = parseFloat(document.getElementById('studio-budget').value) || 0;
+    const desc = document.getElementById('studio-desc').value.trim();
+    
+    const coverPhoto = customUploadedImage || regionImages[region] || "https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80";
+
+    userTrips.unshift({
+      name,
+      city: region.split(',')[0],
+      region,
+      days: calculatedTripDays,
+      pax,
+      budget,
+      dates: `${startVal} – ${endVal}`,
+      notes: desc,
+      photo: coverPhoto,
+      badge: "Scheduled Expedition"
+    });
+
+    alert(`✦ Expedition "${name}" has been successfully saved to your dashboard!`);
+    navigateToDashboard();
+  }
+
+  // Render Trips in Dashboard
+  function renderDashboard(){
+    const container = document.getElementById('trips-grid-container');
+    container.innerHTML = '';
+
+    if(userTrips.length === 0){
+      container.innerHTML = `
+        <div class="no-trips-box">
+          <div style="font-size: 32px; margin-bottom: 8px;">✈️</div>
+          <h3 class="no-trips-title">No Active Trips Scheduled</h3>
+          <p class="no-trips-sub">You don't have any saved itineraries yet. Build your first Indian expedition in our dedicated studio!</p>
+          <button class="plan-trip-btn" onclick="navigateToTripScreen()">+ Create Your First Trip</button>
         </div>
       `;
-
-      document.getElementById('viewModal').classList.add('active');
+      document.getElementById('stat-total-budget').textContent = "₹0";
+      document.getElementById('stat-trips-count').textContent = "0 Active Trips";
+      document.getElementById('stat-total-days').textContent = "0 Days";
+      document.getElementById('stat-avg-cost').textContent = "₹0 / day";
+      document.getElementById('stat-total-pax').textContent = "0 Travelers";
+      return;
     }
 
-    function closeViewModal(){
-      document.getElementById('viewModal').classList.remove('active');
-    }
+    let totalBudget = 0;
+    let totalDays = 0;
+    let totalPax = 0;
 
-    // Quick Add from bottom cards
-    function quickAddTrip(name, dests, budget, image){
-      const today = new Date();
-      const start = new Date(today.setDate(today.getDate() + 15)).toISOString().split('T')[0];
-      const end = new Date(today.setDate(today.getDate() + 7)).toISOString().split('T')[0];
+    userTrips.forEach((trip) => {
+      totalBudget += trip.budget;
+      totalDays += trip.days;
+      totalPax += trip.pax;
 
-      trips.unshift({
-        id: Date.now(),
-        name,
-        startDate: start,
-        endDate: end,
-        destinations: dests.split(',').map(s => s.trim()),
-        budget,
-        image,
-        notes: "Quickly crafted via Indian Heritage gems section."
-      });
+      const card = document.createElement('div');
+      card.className = 'trip-card';
+      card.onclick = () => viewTripDetail(trip.name, trip.dates, `₹${trip.budget.toLocaleString('en-IN')}`, `${trip.pax} Travelers`, `${trip.days} Days`, trip.notes);
+      card.innerHTML = `
+        <div class="trip-img" style="background-image: url('${trip.photo}');">
+          <span class="trip-badge">${trip.badge}</span>
+        </div>
+        <div class="trip-details">
+          <div>
+            <h3 class="trip-name">${trip.name}</h3>
+            <p class="trip-dates">${trip.dates} · ${trip.days} Days (${trip.pax} Travelers)</p>
+          </div>
+          <div class="trip-footer">
+            <span class="trip-budget-tag">Est. ₹${trip.budget.toLocaleString('en-IN')}</span>
+            <span class="trip-link">Review Expedition →</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
 
-      renderTrips();
-      updateStats();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const avgCostPerDay = totalDays > 0 ? Math.round(totalBudget / totalDays) : 0;
+    document.getElementById('stat-total-budget').textContent = `₹${totalBudget.toLocaleString('en-IN')}`;
+    document.getElementById('stat-trips-count').textContent = `${userTrips.length} Active Trip${userTrips.length > 1 ? 's' : ''}`;
+    document.getElementById('stat-total-days').textContent = `${totalDays} Days`;
+    document.getElementById('stat-avg-cost').textContent = `₹${avgCostPerDay.toLocaleString('en-IN')} / day`;
+    document.getElementById('stat-total-pax').textContent = `${totalPax} Travelers`;
+  }
 
-    // --- Interactive Map (Leaflet) ---
-    function openMapModal(){
-      document.getElementById('mapModal').classList.add('active');
-      setTimeout(() => {
-        if(!leafletMap){
-          leafletMap = L.map('map-container').setView([20.5937, 78.9629], 5);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(leafletMap);
+  // Auth & Sign-in logic
+  function switchTab(which){
+    const isLogin = which === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    document.getElementById('pane-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('pane-signup').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('login-form').classList.toggle('active', isLogin);
+    document.getElementById('signup-form').classList.toggle('active', !isLogin);
+    document.getElementById('switch-note').innerHTML = isLogin
+      ? 'New to GlobeTrotter? <button onclick="switchTab(\'signup\')">Create an account</button>'
+      : 'Already have an account? <button onclick="switchTab(\'login\')">Sign in</button>';
+  }
+
+  function showForgot(e){
+    e.preventDefault();
+    alert('Password reset instructions dispatched to your registered inbox.');
+  }
+
+  function setError(inputId, errorId, message){
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    input.classList.toggle('invalid', !!message);
+    error.textContent = message || '';
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if(!emailPattern.test(email)){
+      setError('login-email','login-email-error','Enter a valid email address.');
+      valid = false;
+    } else { setError('login-email','login-email-error',''); }
+
+    if(password.length === 0){
+      setError('login-password','login-password-error','Password is required.');
+      valid = false;
+    } else { setError('login-password','login-password-error',''); }
+
+    if(valid){
+      userTrips = [
+        {
+          name: "Udaipur Royal Palace & Lake Pichola Retreat",
+          city: "Udaipur",
+          region: "Udaipur, Rajasthan",
+          days: 6,
+          pax: 2,
+          budget: 68000,
+          dates: "2026-11-14 – 2026-11-19",
+          notes: "Luxury Lake View Suite, Pichola Boat Cruise, Sunset Dinner at Jagmandir, City Palace Private Tour.",
+          photo: regionImages["Udaipur, Rajasthan"],
+          badge: "Confirmed · In 10 Days"
+        },
+        {
+          name: "Rishikesh & Ganga White Water Expedition",
+          city: "Rishikesh",
+          region: "Rishikesh, Uttarakhand",
+          days: 4,
+          pax: 4,
+          budget: 32000,
+          dates: "2026-12-22 – 2026-12-26",
+          notes: "Riverside camp booking, 26km Grade IV River Rafting, Cliff jump session, Beatles Ashram visit.",
+          photo: regionImages["Rishikesh, Uttarakhand"],
+          badge: "Planning Phase"
         }
+      ];
 
-        // Add pins for destinations
-        const coords = [
-          { name: "Jaipur", lat: 26.9124, lng: 75.7873 },
-          { name: "Udaipur", lat: 24.5854, lng: 73.7125 },
-          { name: "Srinagar", lat: 34.0837, lng: 74.7973 },
-          { name: "Kochi", lat: 9.9312, lng: 76.2673 },
-          { name: "Alleppey", lat: 9.4981, lng: 76.3388 },
-          { name: "Varanasi", lat: 25.3176, lng: 82.9739 },
-          { name: "Ladakh", lat: 34.1526, lng: 77.5771 }
-        ];
+      document.getElementById('user-welcome').textContent = "Welcome back, Aarav.";
+      document.getElementById('auth-stage').style.display = 'none';
+      document.getElementById('dashboard-stage').style.display = 'block';
+      renderDashboard();
+    }
+  });
 
-        coords.forEach(c => {
-          L.marker([c.lat, c.lng]).addTo(leafletMap)
-            .bindPopup(`<b>${c.name}</b><br>Active Expedition Hub`);
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    if(name.length === 0){ setError('signup-name','signup-name-error','Name is required.'); valid = false; }
+    else { setError('signup-name','signup-name-error',''); }
+
+    if(!emailPattern.test(email)){ setError('signup-email','signup-email-error','Enter a valid email address.'); valid = false; }
+    else { setError('signup-email','signup-email-error',''); }
+
+    if(password.length < 8){ setError('signup-password','signup-password-error','Use at least 8 characters.'); valid = false; }
+    else { setError('signup-password','signup-password-error',''); }
+
+    if(valid){
+      userTrips = [];
+      document.getElementById('stub-passenger').textContent = name.toUpperCase();
+      document.getElementById('user-welcome').textContent = `Welcome, ${name}!`;
+      document.getElementById('auth-stage').style.display = 'none';
+      document.getElementById('dashboard-stage').style.display = 'block';
+      renderDashboard();
+    }
+  });
+
+  function logout(){
+    document.getElementById('dashboard-stage').style.display = 'none';
+    document.getElementById('trip-screen-stage').style.display = 'none';
+    document.getElementById('auth-stage').style.display = 'grid';
+  }
+
+  // Modals
+  function openModal(id){ document.getElementById(id).classList.add('active'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+  function viewTripDetail(title, dates, budget, party, days, schedule){
+    document.getElementById('trip-detail-title').textContent = title;
+    document.getElementById('trip-detail-dates').textContent = dates;
+    document.getElementById('trip-detail-budget').textContent = budget;
+    document.getElementById('trip-detail-party').textContent = party;
+    document.getElementById('trip-detail-days').textContent = days;
+    document.getElementById('trip-detail-schedule').textContent = schedule;
+    openModal('trip-detail-modal');
+  }
+
+  function openAllTripsModal(){
+    if(userTrips.length === 0){
+      alert("No active trips to display. Plan a new trip first!");
+      return;
+    }
+    const summary = userTrips.map((t, i) => `${i+1}. ${t.name} (${t.city}) — ₹${t.budget.toLocaleString('en-IN')} [${t.days} Days]`).join('\n\n');
+    viewTripDetail('All Active Itineraries Summary', 'Various Dates', document.getElementById('stat-total-budget').textContent, `${document.getElementById('stat-total-pax').textContent}`, `${document.getElementById('stat-total-days').textContent}`, summary);
+  }
+
+  // Pan-India Map Markers
+  const indianCitiesCoords = [
+    { name: "Jaipur", region: "Jaipur, Rajasthan", coords: [26.9124, 75.7873], desc: "Pink City & Historic Forts" },
+    { name: "Varanasi", region: "Varanasi, Uttar Pradesh", coords: [25.3176, 82.9739], desc: "Sacred Ghats & Cultural Heritage" },
+    { name: "Udaipur", region: "Udaipur, Rajasthan", coords: [24.5854, 73.7125], desc: "City of Lakes & Palaces" },
+    { name: "Munnar", region: "Munnar & Alleppey, Kerala", coords: [10.0889, 77.0595], desc: "Emerald Hills & Tea Plantations" },
+    { name: "Goa", region: "Goa (North & South), Goa", coords: [15.2993, 74.1240], desc: "Coastal Sunsets & Heritage" },
+    { name: "Leh-Ladakh", region: "Leh-Ladakh, Ladakh", coords: [34.1526, 77.5771], desc: "High Himalayan Mountain Passes" },
+    { name: "Rishikesh", region: "Rishikesh, Uttarakhand", coords: [30.0869, 78.2676], desc: "Ganga Rafting & Ashrams" },
+    { name: "Darjeeling", region: "Darjeeling & Kalimpong, West Bengal", coords: [27.0410, 88.2663], desc: "Himalayan Toy Train & Tea Hills" },
+    { name: "Mumbai", region: "Mumbai, Maharashtra", coords: [19.0760, 72.8777], desc: "Marine Drive & Gateway of India" },
+    { name: "Kaziranga", region: "Kaziranga & Majuli, Assam", coords: [26.5775, 93.1711], desc: "One-Horned Rhino Safari" }
+  ];
+
+  function openIndiaMap(){
+    openModal('map-modal');
+    setTimeout(() => {
+      if(!mapInstance){
+        mapInstance = L.map('map-container').setView([22.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        indianCitiesCoords.forEach(city => {
+          const marker = L.marker(city.coords).addTo(mapInstance);
+          marker.bindPopup(`
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;">
+              <b style="color:#0A1424; font-size:14px;">${city.name}</b><br>
+              <span style="color:#64748B; font-size:12px;">${city.desc}</span><br>
+              <button onclick="closeModal('map-modal'); quickPlanCity('${city.name}', '${city.region}');" style="margin-top:6px; background:#0A1424; color:#FAF7F2; border:none; padding:5px 10px; border-radius:4px; font-size:11px; cursor:pointer; font-weight:600;">Plan in Expedition Studio</button>
+            </div>
+          `);
         });
-
-        leafletMap.invalidateSize();
-      }, 200);
-    }
-
-    function closeMapModal(){
-      document.getElementById('mapModal').classList.remove('active');
-    }
-  </script>
+      } else {
+        mapInstance.invalidateSize();
+      }
+    }, 200);
+  }
+</script>
 </body>
 </html>
